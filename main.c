@@ -89,18 +89,24 @@ int main() {
     int returnSize;
     uchar *block;
     uchar **result = permute(nums, ARRAY_SIZE, &returnSize, &block);
-    uchar **tuples = NULL;
+    tuples **tps = NULL;
+    int size = 0;  // Ajout de la variable size pour suivre la taille du tableau de tuples
 
     printf("returnSize=%d\n", returnSize);
     for (int i = 0; i < returnSize; i++) {
         for (int j = 1; j < ARRAY_SIZE; j++) {
-            ajoute_tuples(&tuples, result[i], j);
+            ajoute_tuples(&tps, &size, result[i], j);  // Remarquez que je passe &size et non result[i]
         }
         printf("\n");
     }
 
+    // Libération de la mémoire
     free(block);
     free(result);
+    for (int i = 0; i < size; ++i) {
+        free(tps[i]);
+    }
+    free(tps);
 
     return 0;
 }

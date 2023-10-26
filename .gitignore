@@ -1,0 +1,46 @@
+# Fichiers compilés
+*.o
+*.so
+*.ko
+*.obj
+
+# Fichiers générés par l'IDE (comme ceux de CLion, Visual Studio, etc.)
+*.user
+*.suo
+*.sln
+*.swp
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Exécutables
+*.exe
+*.out
+*.app
+*.dll
+*.a
+*.dylib
+
+# Autres fichiers générés pendant la compilation
+*.log
+*.map
+*.tar.*
+*.zip
+*.gz
+*.xz
+*.dSYM/
+
+# Fichiers temporaires
+*.bak
+*.tmp
+*.swp
+
+# Dossiers de construction
+build/
+dist/
+Debug/
+Release/
+cmake-build-*/
+
