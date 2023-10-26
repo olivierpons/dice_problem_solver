@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ARRAY_SIZE 7
+//#define ARRAY_SIZE 7
+#define ARRAY_SIZE 6
 typedef unsigned char uchar;
 
 typedef struct {
@@ -65,48 +66,71 @@ uchar** permute(const uchar *nums, int numsSize, int *returnSize, uchar **block)
     return result;
 }
 
-void ajoute_tuples(tuples ***tps, int *size, uchar *arr, int cut) {
+void add_tuples(tuples **tps, int *size, int *capacity, uchar *arr, int cut) {
     for (int i = 0; i < *size; ++i) {
-        if (memcmp((*tps)[i]->a1, arr, cut) == 0 &&
-            memcmp((*tps)[i]->a2, arr + cut, ARRAY_SIZE - cut) == 0) {
+        if (memcmp((*tps)[i].a1, arr, cut) == 0 &&
+            memcmp((*tps)[i].a2, arr + cut, ARRAY_SIZE - cut) == 0) {
             return;
         }
     }
 
-    *tps = (tuples **)realloc(*tps, (*size + 1) * sizeof(tuples *));
-    (*tps)[*size] = (tuples *)malloc(sizeof(tuples));
+    if (*size == 0) {
+        *capacity = 1;
+        *size = 0;
+        *tps = (tuples *) malloc((*capacity) * sizeof(tuples));
+        memset(*tps, 0, sizeof(tuples));
+    }
+    if (*size == *capacity) {
+        *capacity *= 2;
+        *tps = (tuples *)realloc(*tps, (*capacity) * sizeof(tuples));
+        memset(&((*tps)[*size]), 0, (*capacity - *size) * sizeof(tuples));
+    }
 
-    memcpy((*tps)[*size]->a1, arr, cut);
-    (*tps)[*size]->len_a1 = cut;
-    memcpy((*tps)[*size]->a2, arr + cut, ARRAY_SIZE - cut);
-    (*tps)[*size]->len_a2 = ARRAY_SIZE - cut;
+    memcpy((*tps)[*size].a1, arr, cut);
+    (*tps)[*size].len_a1 = cut;
+    memcpy((*tps)[*size].a2, arr + cut, ARRAY_SIZE - cut);
+    (*tps)[*size].len_a2 = ARRAY_SIZE - cut;
 
     (*size)++;
 }
 
-int main() {
-    unsigned char nums[ARRAY_SIZE] = {1, 2, 3, 4, 5, 6, 7};
-    int returnSize;
-    uchar *block;
-    uchar **result = permute(nums, ARRAY_SIZE, &returnSize, &block);
-    tuples **tps = NULL;
-    int size = 0;  // Ajout de la variable size pour suivre la taille du tableau de tuples
+void print_tuples(tuples *tps, int size) {
+    for (int i = 0; i < size; ++i) {
+        printf("[");
+        for (int j = 0; j < tps[i].len_a1; ++j) {
+            printf("%d", tps[i].a1[j]);
+            if (j < tps[i].len_a1 - 1) {
+                printf(", ");
+            }
+        }
+        printf("] - [");
+        for (int j = 0; j < tps[i].len_a2; ++j) {
+            printf("%d", tps[i].a2[j]);
+            if (j < tps[i].len_a2 - 1) {
+                printf(", ");
+            }
+        }
+        printf("]\n");
+    }
+}
 
-    printf("returnSize=%d\n", returnSize);
+int main() {
+    unsigned char nums[ARRAY_SIZE] = {1, 2, 3, 4, 5, 6};
+    int returnSize = 0;
+    uchar *block = NULL;
+    uchar **result = permute(nums, ARRAY_SIZE, &returnSize, &block);
+    tuples *tps = NULL;
+    int size = 0;
+    int capacity = 0;
+
     for (int i = 0; i < returnSize; i++) {
         for (int j = 1; j < ARRAY_SIZE; j++) {
-            ajoute_tuples(&tps, &size, result[i], j);  // Remarquez que je passe &size et non result[i]
+            add_tuples(&tps, &size, &capacity, result[i], j);
         }
-        printf("\n");
     }
-
-    // Libération de la mémoire
+    print_tuples(tps, size);
     free(block);
     free(result);
-    for (int i = 0; i < size; ++i) {
-        free(tps[i]);
-    }
     free(tps);
-
     return 0;
 }
