@@ -9,12 +9,25 @@
 #define TRAITOR (int) 4
 #define CURSED (int) 5
 #define MAGE (int) 6
-#define WOLF_FENRIR (int) 7
-#define SNAKE_JORMUNGAND (int) 8
-#define HORSE_SLEIPNIR (int) 9
-#define DRAGON_FAFNIR (int) 10
-#define WILDBOAR_GULLINBURSTI (int) 11
-#define EAGLE_HRAESVELG (int) 12
+#define WOLF (int) 7
+#define SNAKE (int) 8
+#define HORSE (int) 9
+#define DRAGON (int) 10
+#define WILDBOAR (int) 11
+#define EAGLE (int) 12
+
+#define POTTER (int) 13
+#define PEASANT (int) 14
+#define SCRIBE (int) 15
+#define THIEF (int) 16
+#define SHAMAN (int) 17
+#define QUEEN (int) 18
+#define ARMADILLO (int) 19
+#define DEER (int) 20
+#define IGUANA (int) 21
+#define SCORPION (int) 22
+#define JAGUAR (int) 23
+#define BEE (int) 24
 
 typedef struct {
     int a[ARRAY_MAX_SIZE];

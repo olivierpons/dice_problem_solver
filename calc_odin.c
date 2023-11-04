@@ -60,8 +60,8 @@ void calc_mages(tuple *t) {
         }
     }
 }
-void calc_wolfs_fenrir(tuple *t, int v) {
-    if (v != WOLF_FENRIR) {
+void calc_wolf(tuple *t, int v) {
+    if (v != WOLF) {
         return;
     }
     int mx = 0, j = 0;
@@ -76,8 +76,8 @@ void calc_wolfs_fenrir(tuple *t, int v) {
     }
 }
 
-void calc_snake_jormungand(tuple *t, int v) {
-    if (v != SNAKE_JORMUNGAND) {
+void calc_snake(tuple *t, int v) {
+    if (v != SNAKE) {
         return;
     }
     int mx = 0, j = 0;
@@ -92,8 +92,8 @@ void calc_snake_jormungand(tuple *t, int v) {
     }
 }
 
-void calc_horse_sleipnir(tuple *t, int v) {
-    if (v != HORSE_SLEIPNIR) {
+void calc_horse(tuple *t, int v) {
+    if (v != HORSE) {
         return;
     }
     for (int i = 0; i < t->a_len; ++i) {
@@ -101,8 +101,8 @@ void calc_horse_sleipnir(tuple *t, int v) {
     }
 }
 
-void calc_dragon_fafnir(tuple *t, int v) {
-    if (v != DRAGON_FAFNIR) {
+void calc_dragon(tuple *t, int v) {
+    if (v != DRAGON) {
         return;
     }
     for (int i = 0; i < t->a_len; ++i) {
@@ -110,8 +110,8 @@ void calc_dragon_fafnir(tuple *t, int v) {
     }
 }
 
-void calc_wildboar_gullinbursti(tuple *t, int v) {
-    if (v != WILDBOAR_GULLINBURSTI) {
+void calc_wildboar(tuple *t, int v) {
+    if (v != WILDBOAR) {
         return;
     }
     int ok[ARRAY_MAX_SIZE];
@@ -132,8 +132,8 @@ void calc_wildboar_gullinbursti(tuple *t, int v) {
     }
 }
 
-void calc_wildboar_eagle_hraesvelg(tuple *t, int v) {
-    if (v != EAGLE_HRAESVELG) {
+void calc_wildboar_and_eagle(tuple *t, int v) {
+    if (v != EAGLE) {
         return;
     }
     int ok[ARRAY_MAX_SIZE];

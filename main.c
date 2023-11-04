@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "calc_odin.h"
+#include "calc_coba.h"
 
 void swap(int *a, int *b) {
     int temp = *a;
@@ -166,21 +167,35 @@ void comp_one(tuple *t) {
     calc_cursed(t);
     calc_traitors(t);
     calc_mages(t);
-    calc_wolfs_fenrir(t, t->m1);
-    calc_snake_jormungand(t, t->m1);
-    calc_horse_sleipnir(t, t->m1);
-    calc_dragon_fafnir(t, t->m1);
-    calc_wolfs_fenrir(t, t->m2);
-    calc_snake_jormungand(t, t->m2);
-    calc_horse_sleipnir(t, t->m2);
-    calc_dragon_fafnir(t, t->m2);
+    calc_wolf(t, t->m1);
+    calc_snake(t, t->m1);
+    calc_horse(t, t->m1);
+    calc_dragon(t, t->m1);
+    calc_wolf(t, t->m2);
+    calc_snake(t, t->m2);
+    calc_horse(t, t->m2);
+    calc_dragon(t, t->m2);
+
+
+    calc_potter(t);
+    calc_peasant(t);
+//    calc_scribe(t);
+//    calc_thief(t);
+//    calc_shaman(t);
+//    calc_queen(t);
+//    calc_armadillo(t);
+//    calc_deer(t);
+//    calc_iguana(t);
+//    calc_scorpion(t);
+//    calc_jaguar(t);
+//    calc_bee(t);
 }
 
 void comp_both(tuples *t, int v) {
-    calc_wildboar_gullinbursti(&t->a1, v);
-    calc_wildboar_gullinbursti(&t->a2, v);
-    calc_wildboar_eagle_hraesvelg(&t->a1, v);
-    calc_wildboar_eagle_hraesvelg(&t->a2, v);
+    calc_wildboar(&t->a1, v);
+    calc_wildboar(&t->a2, v);
+    calc_wildboar_and_eagle(&t->a1, v);
+    calc_wildboar_and_eagle(&t->a2, v);
 }
 
 void calc_sum(tuple *t) {
@@ -201,13 +216,13 @@ void compute_dice_challenge(int challenge_no, tuple t) {
 
     int g1 = 0, g2 = 0, l1 = 0, l2 = 0;
     if (t.m1) {
-        if (t.m1 == WILDBOAR_GULLINBURSTI || t.m1 == EAGLE_HRAESVELG) {
+        if (t.m1 == WILDBOAR || t.m1 == EAGLE) {
             g1 = t.m1;
         } else {
             l1 = t.m1;
         }
         if (t.m2) {
-            if (t.m2 == WILDBOAR_GULLINBURSTI || t.m2 == EAGLE_HRAESVELG) {
+            if (t.m2 == WILDBOAR || t.m2 == EAGLE) {
                 if (g1) {
                     g2 = t.m2;
                 } else {
@@ -243,8 +258,8 @@ void compute_dice_challenge(int challenge_no, tuple t) {
             tps[i].a2.a[0] == CURSED &&
             tps[i].a2.a[1] == MAGE &&
             tps[i].a2.a[2] == MAGE &&
-            tps[i].a2.m1 != WOLF_FENRIR &&
-            tps[i].a1.m2 == WILDBOAR_GULLINBURSTI
+            tps[i].a2.m1 != WOLF &&
+            tps[i].a1.m2 == WILDBOAR
             ) {
             printf("here\n");
         }
@@ -280,6 +295,7 @@ void compute_dice_challenge(int challenge_no, tuple t) {
 
 int main() {
     tuple nums[] = {
+/*
         { .a = { HERO, HERO, HERO, CAPTAIN, SOLDIER, SOLDIER, SOLDIER }, .m1 = 0, .m2 = 0 },
         { .a = { HERO, HERO, CAPTAIN, CAPTAIN, CAPTAIN, CAPTAIN, TRAITOR }, .m1 = 0, .m2 = 0 },
         { .a = { HERO, HERO, HERO, CAPTAIN, CAPTAIN, CAPTAIN, CURSED }, .m1 = 0, .m2 = 0 },
@@ -295,42 +311,45 @@ int main() {
         { .a = { SOLDIER, CURSED, CURSED, MAGE, MAGE, MAGE, MAGE }, .m1 = 0, .m2 = 0 },
         { .a = { HERO, CAPTAIN, CAPTAIN, CURSED, MAGE, MAGE, MAGE }, .m1 = 0, .m2 = 0 },
         { .a = { HERO, SOLDIER, TRAITOR, TRAITOR, MAGE, MAGE, MAGE }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, HERO, HERO, CAPTAIN, SOLDIER, SOLDIER, MAGE }, .m1 = WOLF_FENRIR, .m2 = 0 },
-        { .a = { HERO, CAPTAIN, CAPTAIN, CAPTAIN, SOLDIER, TRAITOR, MAGE }, .m1 = WOLF_FENRIR, .m2 = 0 },
-        { .a = { HERO, SOLDIER, SOLDIER, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = WOLF_FENRIR, .m2 = 0 },
-        { .a = { HERO, SOLDIER, SOLDIER, CURSED, CURSED, CURSED, MAGE }, .m1 = SNAKE_JORMUNGAND, .m2 = 0 },
-        { .a = { HERO, TRAITOR, TRAITOR, CURSED, MAGE, MAGE, MAGE }, .m1 = SNAKE_JORMUNGAND, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, TRAITOR, CURSED, MAGE, MAGE }, .m1 = SNAKE_JORMUNGAND, .m2 = 0 },
-        { .a = { HERO, CAPTAIN, CAPTAIN, CAPTAIN, SOLDIER, SOLDIER, MAGE }, .m1 = HORSE_SLEIPNIR, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, CAPTAIN, SOLDIER, TRAITOR, MAGE }, .m1 = HORSE_SLEIPNIR, .m2 = 0 },
-        { .a = { HERO, CAPTAIN, TRAITOR, CURSED, MAGE, MAGE, MAGE }, .m1 = HORSE_SLEIPNIR, .m2 = 0 },
-        { .a = { SOLDIER, SOLDIER, SOLDIER, CURSED, CURSED, CURSED, MAGE }, .m1 = DRAGON_FAFNIR, .m2 = 0 },
-        { .a = { HERO, HERO, HERO, HERO, TRAITOR, CURSED, MAGE }, .m1 = DRAGON_FAFNIR, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = DRAGON_FAFNIR, .m2 = 0 },
-        { .a = { CAPTAIN, CAPTAIN, CAPTAIN, SOLDIER, CURSED, CURSED, MAGE }, .m1 = WILDBOAR_GULLINBURSTI, .m2 = 0 },
-        { .a = { HERO, HERO, TRAITOR, CURSED, CURSED, MAGE, MAGE }, .m1 = WILDBOAR_GULLINBURSTI, .m2 = 0 },
-        { .a = { HERO, TRAITOR, TRAITOR, CURSED, MAGE, MAGE, MAGE }, .m1 = WILDBOAR_GULLINBURSTI, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, SOLDIER, CURSED, CURSED, MAGE }, .m1 = EAGLE_HRAESVELG, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, SOLDIER, SOLDIER, TRAITOR, MAGE }, .m1 = EAGLE_HRAESVELG, .m2 = 0 },
-        { .a = { HERO, HERO, HERO, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = EAGLE_HRAESVELG, .m2 = 0 },
-        { .a = { HERO, HERO, SOLDIER, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = HORSE_SLEIPNIR, .m2 = WILDBOAR_GULLINBURSTI },
-        { .a = { SOLDIER, SOLDIER, CURSED, CURSED, CURSED, MAGE, MAGE }, .m1 = WOLF_FENRIR, .m2 = DRAGON_FAFNIR },
-        { .a = { HERO, SOLDIER, SOLDIER, TRAITOR, MAGE, MAGE, MAGE }, .m1 = HORSE_SLEIPNIR, .m2 = EAGLE_HRAESVELG },
-        { .a = { HERO, SOLDIER, SOLDIER, TRAITOR, TRAITOR, MAGE, MAGE }, .m1 = DRAGON_FAFNIR, .m2 = WILDBOAR_GULLINBURSTI },
-        { .a = { HERO, HERO, SOLDIER, TRAITOR, TRAITOR, TRAITOR, MAGE }, .m1 = SNAKE_JORMUNGAND, .m2 = EAGLE_HRAESVELG },
-        { .a = { HERO, CAPTAIN, CAPTAIN, TRAITOR, MAGE, MAGE, MAGE }, .m1 = WILDBOAR_GULLINBURSTI, .m2 = HORSE_SLEIPNIR },
-        { .a = { HERO, SOLDIER, SOLDIER, SOLDIER, CURSED, CURSED, MAGE }, .m1 = SNAKE_JORMUNGAND, .m2 = DRAGON_FAFNIR },
-        { .a = { HERO, HERO, SOLDIER, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = WILDBOAR_GULLINBURSTI, .m2 = EAGLE_HRAESVELG },
-        { .a = { HERO, HERO, HERO, TRAITOR, TRAITOR, CURSED, MAGE }, .m1 = DRAGON_FAFNIR, .m2 = WILDBOAR_GULLINBURSTI },
+        { .a = { HERO, HERO, HERO, CAPTAIN, SOLDIER, SOLDIER, MAGE }, .m1 = WOLF, .m2 = 0 },
+        { .a = { HERO, CAPTAIN, CAPTAIN, CAPTAIN, SOLDIER, TRAITOR, MAGE }, .m1 = WOLF, .m2 = 0 },
+        { .a = { HERO, SOLDIER, SOLDIER, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = WOLF, .m2 = 0 },
+        { .a = { HERO, SOLDIER, SOLDIER, CURSED, CURSED, CURSED, MAGE }, .m1 = SNAKE, .m2 = 0 },
+        { .a = { HERO, TRAITOR, TRAITOR, CURSED, MAGE, MAGE, MAGE }, .m1 = SNAKE, .m2 = 0 },
+        { .a = { HERO, HERO, CAPTAIN, TRAITOR, CURSED, MAGE, MAGE }, .m1 = SNAKE, .m2 = 0 },
+        { .a = { HERO, CAPTAIN, CAPTAIN, CAPTAIN, SOLDIER, SOLDIER, MAGE }, .m1 = HORSE, .m2 = 0 },
+        { .a = { HERO, HERO, CAPTAIN, CAPTAIN, SOLDIER, TRAITOR, MAGE }, .m1 = HORSE, .m2 = 0 },
+        { .a = { HERO, CAPTAIN, TRAITOR, CURSED, MAGE, MAGE, MAGE }, .m1 = HORSE, .m2 = 0 },
+        { .a = { SOLDIER, SOLDIER, SOLDIER, CURSED, CURSED, CURSED, MAGE }, .m1 = DRAGON, .m2 = 0 },
+        { .a = { HERO, HERO, HERO, HERO, TRAITOR, CURSED, MAGE }, .m1 = DRAGON, .m2 = 0 },
+        { .a = { HERO, HERO, CAPTAIN, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = DRAGON, .m2 = 0 },
+        { .a = { CAPTAIN, CAPTAIN, CAPTAIN, SOLDIER, CURSED, CURSED, MAGE }, .m1 = WILDBOAR, .m2 = 0 },
+        { .a = { HERO, HERO, TRAITOR, CURSED, CURSED, MAGE, MAGE }, .m1 = WILDBOAR, .m2 = 0 },
+        { .a = { HERO, TRAITOR, TRAITOR, CURSED, MAGE, MAGE, MAGE }, .m1 = WILDBOAR, .m2 = 0 },
+        { .a = { HERO, HERO, CAPTAIN, SOLDIER, CURSED, CURSED, MAGE }, .m1 = EAGLE, .m2 = 0 },
+        { .a = { HERO, HERO, CAPTAIN, SOLDIER, SOLDIER, TRAITOR, MAGE }, .m1 = EAGLE, .m2 = 0 },
+        { .a = { HERO, HERO, HERO, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = EAGLE, .m2 = 0 },
+        { .a = { HERO, HERO, SOLDIER, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = HORSE, .m2 = WILDBOAR },
+        { .a = { SOLDIER, SOLDIER, CURSED, CURSED, CURSED, MAGE, MAGE }, .m1 = WOLF, .m2 = DRAGON },
+        { .a = { HERO, SOLDIER, SOLDIER, TRAITOR, MAGE, MAGE, MAGE }, .m1 = HORSE, .m2 = EAGLE },
+        { .a = { HERO, SOLDIER, SOLDIER, TRAITOR, TRAITOR, MAGE, MAGE }, .m1 = DRAGON, .m2 = WILDBOAR },
+        { .a = { HERO, HERO, SOLDIER, TRAITOR, TRAITOR, TRAITOR, MAGE }, .m1 = SNAKE, .m2 = EAGLE },
+        { .a = { HERO, CAPTAIN, CAPTAIN, TRAITOR, MAGE, MAGE, MAGE }, .m1 = WILDBOAR, .m2 = HORSE },
+        { .a = { HERO, SOLDIER, SOLDIER, SOLDIER, CURSED, CURSED, MAGE }, .m1 = SNAKE, .m2 = DRAGON },
+        { .a = { HERO, HERO, SOLDIER, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = WILDBOAR, .m2 = EAGLE },
+        { .a = { HERO, HERO, HERO, TRAITOR, TRAITOR, CURSED, MAGE }, .m1 = DRAGON, .m2 = WILDBOAR },
         //43 = problem: not solvable!
-        { .a = { HERO, HERO, TRAITOR, CURSED, CURSED, MAGE, MAGE }, .m1 = WOLF_FENRIR, .m2 = WILDBOAR_GULLINBURSTI },
-        { .a = { SOLDIER, SOLDIER, SOLDIER, SOLDIER, SOLDIER, CAPTAIN, MAGE }, .m1 = WOLF_FENRIR, .m2 = SNAKE_JORMUNGAND },
-        { .a = { CAPTAIN, SOLDIER, SOLDIER, SOLDIER, MAGE, MAGE, MAGE }, .m1 = HORSE_SLEIPNIR, .m2 = EAGLE_HRAESVELG },
-        { .a = { HERO, HERO, CAPTAIN, SOLDIER, TRAITOR, CURSED, MAGE }, .m1 = WOLF_FENRIR, .m2 = WOLF_FENRIR },
-        { .a = { HERO, SOLDIER, SOLDIER, TRAITOR, TRAITOR, TRAITOR, MAGE }, .m1 = SNAKE_JORMUNGAND, .m2 = WILDBOAR_GULLINBURSTI },
-        { .a = { HERO, HERO, TRAITOR, TRAITOR, TRAITOR, CURSED, MAGE }, .m1 = WOLF_FENRIR, .m2 = EAGLE_HRAESVELG },
-        { .a = { HERO, HERO, CAPTAIN, CAPTAIN, CAPTAIN, TRAITOR, MAGE }, .m1 = WOLF_FENRIR, .m2 = SNAKE_JORMUNGAND },
-        { .a = { HERO, HERO, CAPTAIN, TRAITOR, MAGE, MAGE, MAGE }, .m1 = SNAKE_JORMUNGAND, .m2 = HORSE_SLEIPNIR },
+        { .a = { HERO, HERO, TRAITOR, CURSED, CURSED, MAGE, MAGE }, .m1 = WOLF, .m2 = WILDBOAR },
+        { .a = { SOLDIER, SOLDIER, SOLDIER, SOLDIER, SOLDIER, CAPTAIN, MAGE }, .m1 = WOLF, .m2 = SNAKE },
+        { .a = { CAPTAIN, SOLDIER, SOLDIER, SOLDIER, MAGE, MAGE, MAGE }, .m1 = HORSE, .m2 = EAGLE },
+        { .a = { HERO, HERO, CAPTAIN, SOLDIER, TRAITOR, CURSED, MAGE }, .m1 = WOLF, .m2 = WOLF },
+        { .a = { HERO, SOLDIER, SOLDIER, TRAITOR, TRAITOR, TRAITOR, MAGE }, .m1 = SNAKE, .m2 = WILDBOAR },
+        { .a = { HERO, HERO, TRAITOR, TRAITOR, TRAITOR, CURSED, MAGE }, .m1 = WOLF, .m2 = EAGLE },
+        { .a = { HERO, HERO, CAPTAIN, CAPTAIN, CAPTAIN, TRAITOR, MAGE }, .m1 = WOLF, .m2 = SNAKE },
+        { .a = { HERO, HERO, CAPTAIN, TRAITOR, MAGE, MAGE, MAGE }, .m1 = SNAKE, .m2 = HORSE },
+*/
+        // Coba
+        { .a = { HERO, HERO, CAPTAIN, TRAITOR, MAGE, MAGE, MAGE }, .m1 = SNAKE, .m2 = HORSE },
     };
 
     for (int i = 0; i < sizeof(nums) / sizeof(nums[0]); i++) {
