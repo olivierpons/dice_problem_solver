@@ -33,6 +33,7 @@ typedef struct {
 } tuples;
 
 #define NUM_ROLES 12
+
 extern const char *roleNames[];
 
 #endif // STRUCTS_H

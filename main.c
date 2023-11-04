@@ -47,7 +47,9 @@ int** permute(const int *nums, int numsSize, int *returnSize, int **block) {
         result[0][i] = nums[i];
     }
 
+    int tmp_total = 0;
     for (int i = 1; i < *returnSize; i++) {
+        tmp_total++;
         for (int j = 0; j < numsSize; j++) {
             result[i][j] = result[i - 1][j];
         }
@@ -59,6 +61,7 @@ int** permute(const int *nums, int numsSize, int *returnSize, int **block) {
 int compare_ints(const void *a, const void *b) {
     return (*(int*)a - *(int*)b);
 }
+
 
 void add_tuple(
     tuples **tps, int *size, int *capacity, tuple *new_a1, tuple *new_a2,
@@ -92,22 +95,23 @@ void add_tuples(
     tuple t1 = {.a_len = cut};
     tuple t2 = {.a_len = ARRAY_MAX_SIZE - cut};
 
-    memcpy(t1.a, arr, cut);
-    memcpy(t2.a, arr + cut, ARRAY_MAX_SIZE - cut);
+    memcpy(t1.a, arr, cut * sizeof(int));
+    memcpy(t2.a, arr + cut, (ARRAY_MAX_SIZE - cut) * sizeof(int));
 
     qsort(t1.a, t1.a_len, sizeof(int), compare_ints);
     qsort(t2.a, t2.a_len, sizeof(int), compare_ints);
 
     for (int i = 0; i < *size; ++i) {
-        if (memcmp((*t)[i].a1.a, t1.a, cut) == 0 &&
-            memcmp((*t)[i].a2.a, t2.a, ARRAY_MAX_SIZE - cut) == 0) {
+        if (memcmp((*t)[i].a1.a, t1.a, cut * sizeof(int)) == 0 &&
+            memcmp((*t)[i].a2.a, t2.a, (ARRAY_MAX_SIZE - cut) * sizeof(int)) == 0) {
             return;
         }
-        if (memcmp((*t)[i].a2.a, t1.a, cut) == 0 &&
-            memcmp((*t)[i].a1.a, t2.a, ARRAY_MAX_SIZE - cut) == 0) {
+        if (memcmp((*t)[i].a2.a, t1.a, cut * sizeof(int)) == 0 &&
+            memcmp((*t)[i].a1.a, t2.a, (ARRAY_MAX_SIZE - cut) * sizeof(int)) == 0) {
             return;
         }
     }
+
     if (ml1) {
         if (ml2) {
             add_tuple(t, size, capacity, &t1, &t2, mg1, mg2, ml1, ml2, 0, 0);
@@ -155,25 +159,6 @@ void print_tuple(const tuple *tuple, const char *delimiter, const char *end) {
     }
     printf(" = %d", tuple->sum);
     printf("%s", end);
-}
-
-void print_solutions_found(tuples *tps, int size, int g1, int g2) {
-    for (int i = 0; i < size; ++i) {
-        if (tps[i].a1.sum == tps[i].a2.sum) {
-            print_tuple(&tps[i].a1, ", ", " - ");
-            print_tuple(&tps[i].a2, ", ", "");
-            if (g1) {
-                printf(" - (");
-                print_role(g1);
-                if (g2) {
-                    printf(", ");
-                    print_role(g2);
-                }
-                printf(")");
-            }
-            printf("\n");
-        }
-    }
 }
 
 void comp_one(tuple *t) {
@@ -255,13 +240,13 @@ void compute_dice_challenge(int challenge_no, tuple t) {
     }
     printf("]\n");
     for (int i = 0; i < size; ++i) {
-        /* For debugging purpose uncomment then put a breakpoint at printf():
+        /* For debugging purposes:
         if (
             tps[i].a2.a_len == 3 &&
             tps[i].a2.a[0] == CURSED &&
             tps[i].a2.a[1] == MAGE &&
             tps[i].a2.a[2] == MAGE &&
-            tps[i].a2.m1 != WOLF_FENRIR // &&
+            tps[i].a2.m1 != WOLF_FENRIR &&
             tps[i].a1.m2 == WILDBOAR_GULLINBURSTI
             ) {
             printf("here\n");
@@ -276,7 +261,7 @@ void compute_dice_challenge(int challenge_no, tuple t) {
         calc_sum(&tps[i].a1);
         calc_sum(&tps[i].a2);
 
-        if (tps[i].a1.sum == tps[i].a2.sum) {
+        if (tps[i].a1.sum == tps[i].a2.sum) { // (1) { //
             print_tuple(&tps[i].a1, ", ", " - ");
             print_tuple(&tps[i].a2, ", ", "");
             if (g1) {

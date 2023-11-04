@@ -60,7 +60,6 @@ void calc_mages(tuple *t) {
         }
     }
 }
-
 void calc_wolfs_fenrir(tuple *t, int v) {
     if (v != WOLF_FENRIR) {
         return;
@@ -115,8 +114,8 @@ void calc_wildboar_gullinbursti(tuple *t, int v) {
     if (v != WILDBOAR_GULLINBURSTI) {
         return;
     }
-    int ok[t->a_len];
-    memset(ok, 0, t->a_len * sizeof(*ok));
+    int ok[ARRAY_MAX_SIZE];
+    memset(ok, 0, sizeof(ok[0]) * ARRAY_MAX_SIZE);
     for (int i = 0; i < t->a_len; ++i) {
         int value = t->a[i];
         for (int j = i + 1; j < t->a_len; ++j) {
@@ -137,8 +136,8 @@ void calc_wildboar_eagle_hraesvelg(tuple *t, int v) {
     if (v != EAGLE_HRAESVELG) {
         return;
     }
-    int ok[t->a_len];
-    memset(ok, 0, t->a_len * sizeof(*ok));
+    int ok[ARRAY_MAX_SIZE];
+    memset(ok, 0, sizeof(ok[0]) * ARRAY_MAX_SIZE);
     for (int i = 0; i < t->a_len; ++i) {
         int value = t->a[i];
         for (int j = i + 1; j < t->a_len; ++j) {
