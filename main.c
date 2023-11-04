@@ -159,7 +159,7 @@ void print_tuple(const tuple *tuple, const char *delimiter, const char *end) {
     printf("%s", end);
 }
 
-void comp_one(tuple *t) {
+void comp_one_first(tuple *t) {
     memset(t->a_sum, 0, sizeof(int) * ARRAY_MAX_SIZE);
     calc_heroes(t);
     calc_captains(t);
@@ -167,10 +167,12 @@ void comp_one(tuple *t) {
     calc_cursed(t);
     calc_traitors(t);
     calc_mages(t);
+    /* m1: */
     calc_wolf(t, t->m1);
     calc_snake(t, t->m1);
     calc_horse(t, t->m1);
     calc_dragon(t, t->m1);
+    /* m2: */
     calc_wolf(t, t->m2);
     calc_snake(t, t->m2);
     calc_horse(t, t->m2);
@@ -179,10 +181,11 @@ void comp_one(tuple *t) {
 
     calc_potter(t);
     calc_peasant(t);
-//    calc_scribe(t);
-//    calc_thief(t);
-//    calc_shaman(t);
-//    calc_queen(t);
+    calc_scribe(t);
+    calc_thief(t);
+}
+void comp_one_second(tuple *t) {
+    calc_queen(t);
 //    calc_armadillo(t);
 //    calc_deer(t);
 //    calc_iguana(t);
@@ -204,6 +207,14 @@ void calc_sum(tuple *t) {
         t->sum = (int)(t->sum + t->a_sum[i]);
     }
 
+}
+int has_fig(tuple *t, int v) {
+    for (int i = 0; i < t->a_len; ++i) {
+        if (t->a[i] == v) {
+            return 1;
+        }
+    }
+    return 0;
 }
 void compute_dice_challenge(int challenge_no, tuple t) {
     int returnSize = 0;
@@ -252,20 +263,28 @@ void compute_dice_challenge(int challenge_no, tuple t) {
     }
     printf("]\n");
     for (int i = 0; i < size; ++i) {
-        /* For debugging purposes:
+        /* For debugging purposes: */
         if (
-            tps[i].a2.a_len == 3 &&
-            tps[i].a2.a[0] == CURSED &&
-            tps[i].a2.a[1] == MAGE &&
-            tps[i].a2.a[2] == MAGE &&
-            tps[i].a2.m1 != WOLF &&
-            tps[i].a1.m2 == WILDBOAR
+            tps[i].a1.a_len == 5 &&
+            has_fig(&tps[i].a1, POTTER) &&
+            has_fig(&tps[i].a1, PEASANT) &&
+            has_fig(&tps[i].a1, SHAMAN) &&
+            has_fig(&tps[i].a1, QUEEN) /* &&
+            tps[i].a1.m1 != WOLF &&
+            tps[i].a1.m2 == WILDBOAR */
             ) {
-            printf("here\n");
+//            printf("here\n");
         }
-         */
-        comp_one(&tps[i].a1);
-        comp_one(&tps[i].a2);
+        /* */
+        comp_one_first(&tps[i].a1);
+        comp_one_first(&tps[i].a2);
+
+        calc_shaman(&tps[i].a1, tps[i].a2.a_len);
+        calc_shaman(&tps[i].a2, tps[i].a1.a_len);
+
+        comp_one_second(&tps[i].a1);
+        comp_one_second(&tps[i].a2);
+
         if (tps[i].m1) {
             comp_both(&tps[i], tps[i].m1);
             comp_both(&tps[i], tps[i].m2);
@@ -349,7 +368,21 @@ int main() {
         { .a = { HERO, HERO, CAPTAIN, TRAITOR, MAGE, MAGE, MAGE }, .m1 = SNAKE, .m2 = HORSE },
 */
         // Coba
-        { .a = { HERO, HERO, CAPTAIN, TRAITOR, MAGE, MAGE, MAGE }, .m1 = SNAKE, .m2 = HORSE },
+        { .a = { POTTER, POTTER, POTTER, POTTER, POTTER, POTTER, PEASANT }, .m1 = 0, .m2 = 0 },
+        { .a = { POTTER, POTTER, PEASANT, PEASANT, PEASANT, PEASANT, SCRIBE }, .m1 = 0, .m2 = 0 },
+        { .a = { PEASANT, PEASANT, PEASANT, PEASANT, SCRIBE, SCRIBE, THIEF }, .m1 = 0, .m2 = 0 },
+        { .a = { POTTER, POTTER, POTTER, POTTER, PEASANT, PEASANT, SHAMAN }, .m1 = 0, .m2 = 0 },
+        { .a = { POTTER, POTTER, PEASANT, PEASANT, PEASANT, THIEF, QUEEN }, .m1 = 0, .m2 = 0 },
+        { .a = { POTTER, POTTER, POTTER, POTTER, PEASANT, THIEF, SHAMAN }, .m1 = 0, .m2 = 0 },
+        { .a = { POTTER, PEASANT, PEASANT, SCRIBE, SCRIBE, SCRIBE, QUEEN }, .m1 = 0, .m2 = 0 },
+        { .a = { POTTER, POTTER, POTTER, PEASANT, THIEF, SHAMAN, QUEEN }, .m1 = 0, .m2 = 0 },
+        { .a = { PEASANT, PEASANT, SCRIBE, SCRIBE, SCRIBE, SHAMAN, QUEEN }, .m1 = 0, .m2 = 0 },
+        { .a = { POTTER, SCRIBE, SCRIBE, THIEF, THIEF, SHAMAN, QUEEN }, .m1 = 0, .m2 = 0 },
+        { .a = { PEASANT, THIEF, THIEF, THIEF, SHAMAN, SHAMAN, QUEEN }, .m1 = 0, .m2 = 0 },
+        { .a = { POTTER, POTTER, PEASANT, THIEF, SHAMAN, QUEEN, QUEEN }, .m1 = 0, .m2 = 0 },
+        { .a = { PEASANT, SCRIBE, SCRIBE, SHAMAN, SHAMAN, QUEEN, QUEEN }, .m1 = 0, .m2 = 0 },
+        { .a = { POTTER, PEASANT, PEASANT, SHAMAN, SHAMAN, SHAMAN, QUEEN }, .m1 = 0, .m2 = 0 },
+        { .a = { SCRIBE, SCRIBE, THIEF, SHAMAN, SHAMAN, SHAMAN, QUEEN }, .m1 = 0, .m2 = 0 },
     };
 
     for (int i = 0; i < sizeof(nums) / sizeof(nums[0]); i++) {

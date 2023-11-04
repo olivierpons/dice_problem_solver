@@ -45,7 +45,7 @@ typedef struct {
     int m2;
 } tuples;
 
-#define NUM_ROLES 12
+#define NUM_ROLES 24
 
 extern const char *roleNames[];
 
