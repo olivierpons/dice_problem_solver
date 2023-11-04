@@ -47,9 +47,7 @@ int** permute(const int *nums, int numsSize, int *returnSize, int **block) {
         result[0][i] = nums[i];
     }
 
-    int tmp_total = 0;
     for (int i = 1; i < *returnSize; i++) {
-        tmp_total++;
         for (int j = 0; j < numsSize; j++) {
             result[i][j] = result[i - 1][j];
         }
@@ -61,7 +59,6 @@ int** permute(const int *nums, int numsSize, int *returnSize, int **block) {
 int compare_ints(const void *a, const void *b) {
     return (*(int*)a - *(int*)b);
 }
-
 
 void add_tuple(
     tuples **tps, int *size, int *capacity, tuple *new_a1, tuple *new_a2,
