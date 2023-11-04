@@ -2,7 +2,51 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "calc_odin.h"
+#define ARRAY_MAX_SIZE (int) 7
+
+#define HERO (int) 1
+#define CAPTAIN (int) 2
+#define SOLDIER (int) 3
+#define TRAITOR (int) 4
+#define CURSED (int) 5
+#define MAGE (int) 6
+#define WOLF_FENRIR (int) 7
+#define SNAKE_JORMUNGAND (int) 8
+#define HORSE_SLEIPNIR (int) 9
+#define DRAGON_FAFNIR (int) 10
+#define WILDBOAR_GULLINBURSTI (int) 11
+#define EAGLE_HRAESVELG (int) 12
+
+const char *roleNames[] = {
+    [HERO] = "Hero",
+    [CAPTAIN] = "Captain",
+    [SOLDIER] = "Soldier",
+    [TRAITOR] = "Traitor",
+    [CURSED] = "Cursed",
+    [MAGE] = "Mage",
+    [WOLF_FENRIR] = "Wolf",
+    [SNAKE_JORMUNGAND] = "Snake",
+    [HORSE_SLEIPNIR] = "Horse",
+    [DRAGON_FAFNIR] = "Dragon",
+    [WILDBOAR_GULLINBURSTI] = "Wildboar",
+    [EAGLE_HRAESVELG] = "Eagle",
+};
+
+typedef struct {
+    int a[ARRAY_MAX_SIZE];
+    int a_len;
+    int a_sum[ARRAY_MAX_SIZE];
+    int sum;
+    int m1;
+    int m2;
+} tuple;
+
+typedef struct {
+    tuple a1;
+    tuple a2;
+    int m1;
+    int m2;
+} tuples;
 
 void swap(int *a, int *b) {
     int temp = *a;
@@ -56,9 +100,10 @@ int** permute(const int *nums, int numsSize, int *returnSize, int **block) {
     return result;
 }
 
-int compare_ints(const void *a, const void *b) {
+int compare_int(const void *a, const void *b) {
     return (*(int*)a - *(int*)b);
 }
+
 
 void add_tuple(
     tuples **tps, int *size, int *capacity, tuple *new_a1, tuple *new_a2,
@@ -92,22 +137,23 @@ void add_tuples(
     tuple t1 = {.a_len = cut};
     tuple t2 = {.a_len = ARRAY_MAX_SIZE - cut};
 
-    memcpy(t1.a, arr, cut);
-    memcpy(t2.a, arr + cut, ARRAY_MAX_SIZE - cut);
+    memcpy(t1.a, arr, cut * sizeof(int));
+    memcpy(t2.a, arr + cut, (ARRAY_MAX_SIZE - cut) * sizeof(int));
 
-    qsort(t1.a, t1.a_len, sizeof(int), compare_ints);
-    qsort(t2.a, t2.a_len, sizeof(int), compare_ints);
+    qsort(t1.a, t1.a_len, sizeof(int), compare_int);
+    qsort(t2.a, t2.a_len, sizeof(int), compare_int);
 
     for (int i = 0; i < *size; ++i) {
-        if (memcmp((*t)[i].a1.a, t1.a, cut) == 0 &&
-            memcmp((*t)[i].a2.a, t2.a, ARRAY_MAX_SIZE - cut) == 0) {
+        if (memcmp((*t)[i].a1.a, t1.a, cut * sizeof(int)) == 0 &&
+            memcmp((*t)[i].a2.a, t2.a, (ARRAY_MAX_SIZE - cut) * sizeof(int)) == 0) {
             return;
         }
-        if (memcmp((*t)[i].a2.a, t1.a, cut) == 0 &&
-            memcmp((*t)[i].a1.a, t2.a, ARRAY_MAX_SIZE - cut) == 0) {
+        if (memcmp((*t)[i].a2.a, t1.a, cut * sizeof(int)) == 0 &&
+            memcmp((*t)[i].a1.a, t2.a, (ARRAY_MAX_SIZE - cut) * sizeof(int)) == 0) {
             return;
         }
     }
+
     if (ml1) {
         if (ml2) {
             add_tuple(t, size, capacity, &t1, &t2, mg1, mg2, ml1, ml2, 0, 0);
@@ -126,7 +172,7 @@ void add_tuples(
 }
 
 void print_role(int role) {
-    if (role >= NUM_ROLES || roleNames[role] == NULL) {
+    if (role >= sizeof(roleNames) / sizeof(roleNames[0]) || roleNames[role] == NULL) {
         printf("Unknown: %d", (int)role);
     } else {
         printf("%s", roleNames[role]);
@@ -157,20 +203,156 @@ void print_tuple(const tuple *tuple, const char *delimiter, const char *end) {
     printf("%s", end);
 }
 
-void print_solutions_found(tuples *tps, int size, int g1, int g2) {
-    for (int i = 0; i < size; ++i) {
-        if (tps[i].a1.sum == tps[i].a2.sum) {
-            print_tuple(&tps[i].a1, ", ", " - ");
-            print_tuple(&tps[i].a2, ", ", "");
-            if (g1) {
-                printf(" - (");
-                print_role(g1);
-                if (g2) {
-                    printf(", ");
-                    print_role(g2);
+void calc_heroes(tuple *t) {
+    for (int i = 0; i < t->a_len; ++i) {
+        if (t->a[i] == HERO) {
+            t->a_sum[i] = 3;
+        }
+    }
+}
+
+void calc_captains(tuple *t) {
+    for (int i = 0; i < t->a_len; ++i) {
+        if (t->a[i] == CAPTAIN) {
+            t->a_sum[i] = 2;
+        }
+    }
+}
+
+void calc_soldiers(tuple *t) {
+    for (int i = 0; i < t->a_len; ++i) {
+        if (t->a[i] == SOLDIER) {
+            t->a_sum[i] = 1;
+        }
+    }
+}
+
+void calc_traitors(tuple *t) {
+    for (int i = 0; i < t->a_len; ++i) {
+        if (t->a[i] == TRAITOR) {
+            t->a_sum[i] = 1;
+            for (int j = 0; j < t->a_len; ++j) {
+                if (t->a[j] == HERO && t->a_sum[j]) {
+                    t->a_sum[j] = 0;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void calc_cursed(tuple *t) {
+    for (int i = 0; i < t->a_len; ++i) {
+        if (t->a[i] == CURSED) {
+            t->a_sum[i] = -1;
+        }
+    }
+}
+
+void calc_mages(tuple *t) {
+    for (int i = 0; i < t->a_len; ++i) {
+        if (t->a[i] == MAGE) {
+            int s = 0;
+            for (int j = 0; j < t->a_len; ++j) {
+                if (t->a[j] != MAGE) {
+                    s++;
                 }
                 printf(")");
             }
+            t->a_sum[i] = s;
+        }
+    }
+}
+void calc_wolfs_fenrir(tuple *t, int v) {
+    if (v != WOLF_FENRIR) {
+        return;
+    }
+    int mx = 0, j = 0;
+    for (int i = 0; i < t->a_len; ++i) {
+        if (t->a_sum[i] > mx) {
+            mx = t->a_sum[i];
+            j = i;
+        }
+    }
+    if (mx) {
+        t->a_sum[j] *= 2;
+    }
+}
+
+void calc_snake_jormungand(tuple *t, int v) {
+    if (v != SNAKE_JORMUNGAND) {
+        return;
+    }
+    int mx = 0, j = 0;
+    for (int i = 0; i < t->a_len; ++i) {
+        if (t->a_sum[i] > mx) {
+            mx = t->a_sum[i];
+            j = i;
+        }
+    }
+    if (mx) {
+        t->a_sum[j] = (int)-(t->a_sum[j]);
+    }
+}
+
+void calc_horse_sleipnir(tuple *t, int v) {
+    if (v != HORSE_SLEIPNIR) {
+        return;
+    }
+    for (int i = 0; i < t->a_len; ++i) {
+        t->a_sum[i]++;
+    }
+}
+
+void calc_dragon_fafnir(tuple *t, int v) {
+    if (v != DRAGON_FAFNIR) {
+        return;
+    }
+    for (int i = 0; i < t->a_len; ++i) {
+        t->a_sum[i]--;
+    }
+}
+
+void calc_wildboar_gullinbursti(tuple *t, int v) {
+    if (v != WILDBOAR_GULLINBURSTI) {
+        return;
+    }
+    int ok[ARRAY_MAX_SIZE];
+    memset(ok, 0, sizeof(ok[0]) * ARRAY_MAX_SIZE);
+    for (int i = 0; i < t->a_len; ++i) {
+        int value = t->a[i];
+        for (int j = i + 1; j < t->a_len; ++j) {
+            if (t->a[j] == value) {
+                ok[i] = 1;
+                ok[j] = 1;
+            }
+        }
+    }
+    for (int i = 0; i < t->a_len; ++i) {
+        if (ok[i]) {
+            t->a_sum[i]++;
+        }
+    }
+}
+
+void calc_wildboar_eagle_hraesvelg(tuple *t, int v) {
+    if (v != EAGLE_HRAESVELG) {
+        return;
+    }
+    int ok[ARRAY_MAX_SIZE];
+    memset(ok, 0, sizeof(ok[0]) * ARRAY_MAX_SIZE);
+    for (int i = 0; i < t->a_len; ++i) {
+        int value = t->a[i];
+        for (int j = i + 1; j < t->a_len; ++j) {
+            if (t->a[j] == value) {
+                ok[i] = 1;
+                ok[j] = 1;
+            }
+        }
+    }
+    for (int i = 0; i < t->a_len; ++i) {
+        if (ok[i]) {
+            t->a_sum[i]--;
             printf("\n");
         }
     }
@@ -255,13 +437,13 @@ void compute_dice_challenge(int challenge_no, tuple t) {
     }
     printf("]\n");
     for (int i = 0; i < size; ++i) {
-        /* For debugging purpose uncomment then put a breakpoint at printf():
+        /* For debugging purposes:
         if (
             tps[i].a2.a_len == 3 &&
             tps[i].a2.a[0] == CURSED &&
             tps[i].a2.a[1] == MAGE &&
             tps[i].a2.a[2] == MAGE &&
-            tps[i].a2.m1 != WOLF_FENRIR // &&
+            tps[i].a2.m1 != WOLF_FENRIR &&
             tps[i].a1.m2 == WILDBOAR_GULLINBURSTI
             ) {
             printf("here\n");
@@ -276,7 +458,7 @@ void compute_dice_challenge(int challenge_no, tuple t) {
         calc_sum(&tps[i].a1);
         calc_sum(&tps[i].a2);
 
-        if (tps[i].a1.sum == tps[i].a2.sum) {
+        if (tps[i].a1.sum == tps[i].a2.sum) { // (1) { //
             print_tuple(&tps[i].a1, ", ", " - ");
             print_tuple(&tps[i].a2, ", ", "");
             if (g1) {
