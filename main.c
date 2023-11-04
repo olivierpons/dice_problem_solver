@@ -91,9 +91,7 @@ int** permute(const int *nums, int numsSize, int *returnSize, int **block) {
         result[0][i] = nums[i];
     }
 
-    int tmp_total = 0;
     for (int i = 1; i < *returnSize; i++) {
-        tmp_total++;
         for (int j = 0; j < numsSize; j++) {
             result[i][j] = result[i - 1][j];
         }
@@ -259,6 +257,7 @@ void calc_mages(tuple *t) {
                 if (t->a[j] != MAGE) {
                     s++;
                 }
+                printf(")");
             }
             t->a_sum[i] = s;
         }
@@ -354,6 +353,7 @@ void calc_wildboar_eagle_hraesvelg(tuple *t, int v) {
     for (int i = 0; i < t->a_len; ++i) {
         if (ok[i]) {
             t->a_sum[i]--;
+            printf("\n");
         }
     }
 }
