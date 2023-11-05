@@ -117,6 +117,15 @@ const char* number_to_const_string(int number) {
     return NULL;
 }
 
+int has_value(tuple *t, int value) {
+    for (int i = 0; i < t->a_len; ++i) {
+        if (t->a[i] == value) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 tuple create_tuple_from_string(const char* str) {
     tuple t;
     memset(&t, 0, sizeof(tuple));
@@ -126,45 +135,50 @@ tuple create_tuple_from_string(const char* str) {
         t.a[0] = -1;
         return t;
     }
-    int count = 0;
+    int total = 0;
     char* token = strtok(temp_str, ",");
     while (token != NULL) {
-        count++;
+        total++;
         token = strtok(NULL, ",");
     }
-    if (count < 2) {
-        fprintf(stderr, "Not enough numbers for global_1 and global_2\n");
-        free(temp_str);
+    free(temp_str);
+    if (total < 2 || total > MAX_NORMAL + MAX_GLOBAL) {
+        fprintf(stderr, "Invalid number of elements\n");
         t.a[0] = -1;
         return t;
     }
-    free(temp_str);
+
     temp_str = strdup(str);
     int index = 0;
     token = strtok(temp_str, ",");
     while (token != NULL) {
         while (*token == ' ') token++;
-        if (index == count - 2) {
-            t.m1 = string_const_to_int(token);
-        } else if (index == count - 1) {
-            t.m2 = string_const_to_int(token);
-        } else if (index < ARRAY_MAX_SIZE) {
-            t.a[index] = string_const_to_int(token);
-        } else {
-            fprintf(stderr, "Too many numbers for the array\n");
-            free(temp_str);
-            t.a[0] = -1;
-            return t;
+        int v = string_const_to_int(token);
+        if ( v &&
+            (v != WOLF) &&
+            (v != SNAKE) &&
+            (v != HORSE) &&
+            (v != DRAGON) &&
+            (v != WILDBOAR) &&
+            (v != EAGLE) &&
+            (v != ARMADILLO) &&
+            (v != DEER) &&
+            (v != IGUANA) &&
+            (v != SCORPION) &&
+            (v != JAGUAR) &&
+            (v != BEE)
+            ) {
+            t.a[t.a_len++] = v;
+        } else if (v) {
+            t.local[t.len_local++] = v;
         }
-
         index++;
         token = strtok(NULL, ",");
     }
-
-    t.a_len = index - 2;
     free(temp_str);
     return t;
 }
+
 
 tuple_with_desc create_tuple_desc_from_string(const char* str) {
     tuple_with_desc t_desc;
@@ -196,4 +210,25 @@ tuple_with_desc create_tuple_desc_from_string(const char* str) {
     }
     free(temp_str);
     return t_desc;
+}
+
+void process_modifiers(
+    tuple *t, int global[], int *global_len, int local[], int *local_len
+) {
+    int new_local[MAX_LOCAL];
+    int new_len_local = 0;
+
+    *global_len = 0;
+    *local_len = 0;
+
+    for (int i = 0; i < t->len_local; i++) {
+        if (t->local[i] == WILDBOAR || t->local[i] == EAGLE) {
+            global[(*global_len)++] = t->local[i];
+        } else {
+            local[(*local_len)++] = t->local[i];
+            new_local[new_len_local++] = t->local[i];
+        }
+    }
+    memcpy(t->local, new_local, new_len_local * sizeof(t->local[0]));
+    t->len_local = new_len_local;
 }

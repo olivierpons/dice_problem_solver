@@ -114,8 +114,8 @@ void calc_wildboar(tuple *t, int v) {
     if (v != WILDBOAR) {
         return;
     }
-    int ok[ARRAY_MAX_SIZE];
-    memset(ok, 0, sizeof(ok[0]) * ARRAY_MAX_SIZE);
+    int ok[MAX_NORMAL];
+    memset(ok, 0, sizeof(ok[0]) * MAX_NORMAL);
     for (int i = 0; i < t->a_len; ++i) {
         int value = t->a[i];
         for (int j = i + 1; j < t->a_len; ++j) {
@@ -136,8 +136,8 @@ void calc_wildboar_and_eagle(tuple *t, int v) {
     if (v != EAGLE) {
         return;
     }
-    int ok[ARRAY_MAX_SIZE];
-    memset(ok, 0, sizeof(ok[0]) * ARRAY_MAX_SIZE);
+    int ok[MAX_NORMAL];
+    memset(ok, 0, sizeof(ok[0]) * MAX_NORMAL);
     for (int i = 0; i < t->a_len; ++i) {
         int value = t->a[i];
         for (int j = i + 1; j < t->a_len; ++j) {

@@ -1,7 +1,7 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
-#define ARRAY_MAX_SIZE (int)7
+#define MAX_NORMAL (int)7
 
 #define HERO (int) 1
 #define CAPTAIN (int) 2
@@ -30,14 +30,16 @@
 #define BEE (int) 24
 
 #define NUM_ROLES 24
+#define MAX_GLOBAL 4
+#define MAX_LOCAL MAX_GLOBAL
 
 typedef struct {
-    int a[ARRAY_MAX_SIZE];
+    int a[MAX_NORMAL];
     int a_len;
-    int a_sum[ARRAY_MAX_SIZE];
+    int a_sum[MAX_NORMAL];
     int sum;
-    int m1;
-    int m2;
+    int local[MAX_LOCAL];
+    int len_local;
 } tuple;
 
 typedef struct {
@@ -48,15 +50,19 @@ typedef struct {
 typedef struct {
     tuple a1;
     tuple a2;
-    int global_1;
-    int global_2;
+    int global[MAX_GLOBAL];
+    int len_global;
 } tuples;
 
 extern const char *roleNames[];
 
 extern int string_const_to_int(const char* str);
 extern const char* number_to_const_string(int number);
+extern int has_value(tuple *t, int value);
 extern tuple create_tuple_from_string(const char* str);
 extern tuple_with_desc create_tuple_desc_from_string(const char* str);
+extern void process_modifiers(
+    tuple *t, int global[], int *global_len, int local[], int *local_len
+);
 
 #endif // STRUCTS_H
