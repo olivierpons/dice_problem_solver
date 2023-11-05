@@ -62,8 +62,8 @@ int compare_ints(const void *a, const void *b) {
 }
 
 void add_tuple(
-    tuples **tps, int *size, int *capacity, tuple *new_a1, tuple *new_a2,
-    int m1, int m2, int a1_more1, int a1_more2, int a2_more1, int a2_more2
+    tuples **tps, int *size, int *capacity, tuple *a1, tuple *a2,
+    int g1, int g2, int a1_m1, int a1_m2, int a2_m1, int a2_m2
 ) {
     if (*size == 0) {
         *capacity = 1;
@@ -75,14 +75,14 @@ void add_tuple(
         *tps = (tuples *)realloc(*tps, (*capacity) * sizeof(tuples));
         memset(&((*tps)[*size]), 0, (*capacity - *size) * sizeof(tuples));
     }
-    (*tps)[*size].m1 = m1;
-    (*tps)[*size].m2 = m2;
-    (*tps)[*size].a1 = *new_a1;
-    (*tps)[*size].a2 = *new_a2;
-    (*tps)[*size].a1.m1 = a1_more1;
-    (*tps)[*size].a1.m2 = a1_more2;
-    (*tps)[*size].a2.m1 = a2_more1;
-    (*tps)[*size].a2.m2 = a2_more2;
+    (*tps)[*size].m1 = g1;
+    (*tps)[*size].m2 = g2;
+    (*tps)[*size].a1 = *a1;
+    (*tps)[*size].a2 = *a2;
+    (*tps)[*size].a1.m1 = a1_m1;
+    (*tps)[*size].a1.m2 = a1_m2;
+    (*tps)[*size].a2.m1 = a2_m1;
+    (*tps)[*size].a2.m2 = a2_m2;
     (*size)++;
 }
 
@@ -216,6 +216,23 @@ int has_fig(tuple *t, int v) {
     }
     return 0;
 }
+
+#define MAX_MODIFIERS 4
+void process_modifiers(tuple *t, int both[], int one[]) {
+    int both_count = 0, one_count = 0;
+    int modifiers[MAX_MODIFIERS] = {t->m1, t->m2, t->m3, t->m4};
+
+    for (int i = 0; i < MAX_MODIFIERS; i++) {
+        if (modifiers[i]) {
+            if (modifiers[i] == WILDBOAR || modifiers[i] == EAGLE) {
+                both[both_count++] = modifiers[i];
+            } else {
+                one[one_count++] = modifiers[i];
+            }
+        }
+    }
+}
+
 void compute_dice_challenge(const char* description, tuple t) {
     int returnSize = 0;
     int *block = NULL;
@@ -224,26 +241,28 @@ void compute_dice_challenge(const char* description, tuple t) {
     int size = 0;
     int capacity = 0;
 
-
-    int g1 = 0, g2 = 0, l1 = 0, l2 = 0;
+    int both[MAX_MODIFIERS] = {0};
+    int one[MAX_MODIFIERS] = {0};
+    process_modifiers(&t, both, one);
+    int both_1 = 0, both_2 = 0, one_1 = 0, one_2 = 0;
     if (t.m1) {
         if (t.m1 == WILDBOAR || t.m1 == EAGLE) {
-            g1 = t.m1;
+            both_1 = t.m1;
         } else {
-            l1 = t.m1;
+            one_1 = t.m1;
         }
         if (t.m2) {
             if (t.m2 == WILDBOAR || t.m2 == EAGLE) {
-                if (g1) {
-                    g2 = t.m2;
+                if (both_1) {
+                    both_2 = t.m2;
                 } else {
-                    g1 = t.m2;
+                    both_1 = t.m2;
                 }
             } else {
-                if (l1) {
-                    l2 = t.m2;
+                if (one_1) {
+                    one_2 = t.m2;
                 } else {
-                    l1 = t.m2;
+                    one_1 = t.m2;
                 }
             }
         }
@@ -251,7 +270,10 @@ void compute_dice_challenge(const char* description, tuple t) {
 
     for (int i = 0; i < returnSize; i++) {
         for (int j = 1; j < ARRAY_MAX_SIZE; j++) {
-            add_tuples(&tps, &size, &capacity, result[i], j, g1, g2, l1, l2);
+            add_tuples(
+                &tps, &size, &capacity, result[i], j,
+                both_1, both_2, one_1, one_2
+            );
         }
     }
     printf("\nChallenge %s - [ ", description);
@@ -263,19 +285,19 @@ void compute_dice_challenge(const char* description, tuple t) {
     }
     printf("]\n");
     for (int i = 0; i < size; ++i) {
-        /* For debugging purposes: */
+        /* For debugging purposes:
         if (
             tps[i].a1.a_len == 5 &&
             has_fig(&tps[i].a1, POTTER) &&
             has_fig(&tps[i].a1, PEASANT) &&
             has_fig(&tps[i].a1, SHAMAN) &&
-            has_fig(&tps[i].a1, QUEEN) /* &&
+            has_fig(&tps[i].a1, QUEEN) &&
             tps[i].a1.m1 != WOLF &&
-            tps[i].a1.m2 == WILDBOAR */
+            tps[i].a1.m2 == WILDBOAR
             ) {
-//            printf("here\n");
+            printf("here\n");
         }
-        /* */
+        */
         comp_one_first(&tps[i].a1);
         comp_one_first(&tps[i].a2);
 
@@ -295,12 +317,12 @@ void compute_dice_challenge(const char* description, tuple t) {
         if (tps[i].a1.sum == tps[i].a2.sum) { // (1) { //
             print_tuple(&tps[i].a1, ", ", " - ");
             print_tuple(&tps[i].a2, ", ", "");
-            if (g1) {
+            if (both_1) {
                 printf(" - (");
-                print_role(g1);
-                if (g2) {
+                print_role(both_1);
+                if (both_2) {
                     printf(", ");
-                    print_role(g2);
+                    print_role(both_2);
                 }
                 printf(")");
             }
@@ -311,10 +333,6 @@ void compute_dice_challenge(const char* description, tuple t) {
     free(result);
     free(tps);
 }
-
-
-
-
 
 int main() {
     char *s[] = {

@@ -29,6 +29,8 @@
 #define JAGUAR (int) 23
 #define BEE (int) 24
 
+#define NUM_ROLES 24
+
 typedef struct {
     int a[ARRAY_MAX_SIZE];
     int a_len;
@@ -36,6 +38,8 @@ typedef struct {
     int sum;
     int m1;
     int m2;
+    int m3;
+    int m4;
 } tuple;
 
 typedef struct {
@@ -48,9 +52,9 @@ typedef struct {
     tuple a2;
     int m1;
     int m2;
+    int m3;
+    int m4;
 } tuples;
-
-#define NUM_ROLES 24
 
 extern const char *roleNames[];
 
@@ -58,6 +62,5 @@ extern int string_const_to_int(const char* str);
 extern const char* number_to_const_string(int number);
 extern tuple create_tuple_from_string(const char* str);
 extern tuple_with_desc create_tuple_desc_from_string(const char* str);
-
 
 #endif // STRUCTS_H
