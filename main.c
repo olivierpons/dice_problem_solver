@@ -216,7 +216,7 @@ int has_fig(tuple *t, int v) {
     }
     return 0;
 }
-void compute_dice_challenge(int challenge_no, tuple t) {
+void compute_dice_challenge(const char* description, tuple t) {
     int returnSize = 0;
     int *block = NULL;
     int **result = permute(t.a, ARRAY_MAX_SIZE, &returnSize, &block);
@@ -254,7 +254,7 @@ void compute_dice_challenge(int challenge_no, tuple t) {
             add_tuples(&tps, &size, &capacity, result[i], j, g1, g2, l1, l2);
         }
     }
-    printf("\nChallenge %d - [ ", challenge_no);
+    printf("\nChallenge %s - [ ", description);
     for (int i = 0; i < ARRAY_MAX_SIZE; ++i) {
         print_role(t.a[i]);
         if (i < ARRAY_MAX_SIZE - 1) {
@@ -312,82 +312,150 @@ void compute_dice_challenge(int challenge_no, tuple t) {
     free(tps);
 }
 
+
+
+
+
 int main() {
-    tuple nums[] = {
-/*
-        { .a = { HERO, HERO, HERO, CAPTAIN, SOLDIER, SOLDIER, SOLDIER }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, CAPTAIN, CAPTAIN, CAPTAIN, TRAITOR }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, HERO, HERO, CAPTAIN, CAPTAIN, CAPTAIN, CURSED }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, HERO, HERO, HERO, SOLDIER, TRAITOR, CURSED }, .m1 = 0, .m2 = 0 },
-        { .a = { SOLDIER, SOLDIER, SOLDIER, SOLDIER, SOLDIER, SOLDIER, MAGE }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, SOLDIER, SOLDIER, SOLDIER, MAGE }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, SOLDIER, SOLDIER, CURSED, MAGE }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, CAPTAIN, CAPTAIN, CAPTAIN, CURSED, CURSED, MAGE }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, CAPTAIN, SOLDIER, TRAITOR, MAGE }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, TRAITOR, TRAITOR, TRAITOR, MAGE }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, CAPTAIN, TRAITOR, CURSED, MAGE }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, HERO, SOLDIER, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = 0, .m2 = 0 },
-        { .a = { SOLDIER, CURSED, CURSED, MAGE, MAGE, MAGE, MAGE }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, CAPTAIN, CAPTAIN, CURSED, MAGE, MAGE, MAGE }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, SOLDIER, TRAITOR, TRAITOR, MAGE, MAGE, MAGE }, .m1 = 0, .m2 = 0 },
-        { .a = { HERO, HERO, HERO, CAPTAIN, SOLDIER, SOLDIER, MAGE }, .m1 = WOLF, .m2 = 0 },
-        { .a = { HERO, CAPTAIN, CAPTAIN, CAPTAIN, SOLDIER, TRAITOR, MAGE }, .m1 = WOLF, .m2 = 0 },
-        { .a = { HERO, SOLDIER, SOLDIER, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = WOLF, .m2 = 0 },
-        { .a = { HERO, SOLDIER, SOLDIER, CURSED, CURSED, CURSED, MAGE }, .m1 = SNAKE, .m2 = 0 },
-        { .a = { HERO, TRAITOR, TRAITOR, CURSED, MAGE, MAGE, MAGE }, .m1 = SNAKE, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, TRAITOR, CURSED, MAGE, MAGE }, .m1 = SNAKE, .m2 = 0 },
-        { .a = { HERO, CAPTAIN, CAPTAIN, CAPTAIN, SOLDIER, SOLDIER, MAGE }, .m1 = HORSE, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, CAPTAIN, SOLDIER, TRAITOR, MAGE }, .m1 = HORSE, .m2 = 0 },
-        { .a = { HERO, CAPTAIN, TRAITOR, CURSED, MAGE, MAGE, MAGE }, .m1 = HORSE, .m2 = 0 },
-        { .a = { SOLDIER, SOLDIER, SOLDIER, CURSED, CURSED, CURSED, MAGE }, .m1 = DRAGON, .m2 = 0 },
-        { .a = { HERO, HERO, HERO, HERO, TRAITOR, CURSED, MAGE }, .m1 = DRAGON, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = DRAGON, .m2 = 0 },
-        { .a = { CAPTAIN, CAPTAIN, CAPTAIN, SOLDIER, CURSED, CURSED, MAGE }, .m1 = WILDBOAR, .m2 = 0 },
-        { .a = { HERO, HERO, TRAITOR, CURSED, CURSED, MAGE, MAGE }, .m1 = WILDBOAR, .m2 = 0 },
-        { .a = { HERO, TRAITOR, TRAITOR, CURSED, MAGE, MAGE, MAGE }, .m1 = WILDBOAR, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, SOLDIER, CURSED, CURSED, MAGE }, .m1 = EAGLE, .m2 = 0 },
-        { .a = { HERO, HERO, CAPTAIN, SOLDIER, SOLDIER, TRAITOR, MAGE }, .m1 = EAGLE, .m2 = 0 },
-        { .a = { HERO, HERO, HERO, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = EAGLE, .m2 = 0 },
-        { .a = { HERO, HERO, SOLDIER, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = HORSE, .m2 = WILDBOAR },
-        { .a = { SOLDIER, SOLDIER, CURSED, CURSED, CURSED, MAGE, MAGE }, .m1 = WOLF, .m2 = DRAGON },
-        { .a = { HERO, SOLDIER, SOLDIER, TRAITOR, MAGE, MAGE, MAGE }, .m1 = HORSE, .m2 = EAGLE },
-        { .a = { HERO, SOLDIER, SOLDIER, TRAITOR, TRAITOR, MAGE, MAGE }, .m1 = DRAGON, .m2 = WILDBOAR },
-        { .a = { HERO, HERO, SOLDIER, TRAITOR, TRAITOR, TRAITOR, MAGE }, .m1 = SNAKE, .m2 = EAGLE },
-        { .a = { HERO, CAPTAIN, CAPTAIN, TRAITOR, MAGE, MAGE, MAGE }, .m1 = WILDBOAR, .m2 = HORSE },
-        { .a = { HERO, SOLDIER, SOLDIER, SOLDIER, CURSED, CURSED, MAGE }, .m1 = SNAKE, .m2 = DRAGON },
-        { .a = { HERO, HERO, SOLDIER, SOLDIER, TRAITOR, MAGE, MAGE }, .m1 = WILDBOAR, .m2 = EAGLE },
-        { .a = { HERO, HERO, HERO, TRAITOR, TRAITOR, CURSED, MAGE }, .m1 = DRAGON, .m2 = WILDBOAR },
+    char *s[] = {
+        // Odin:
+        "O 1,HERO,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,SOLDIER,0,0",
+        "O 2,HERO,HERO,CAPTAIN,CAPTAIN,CAPTAIN,CAPTAIN,TRAITOR,0,0",
+        "O 3,HERO,HERO,HERO,CAPTAIN,CAPTAIN,CAPTAIN,CURSED,0,0",
+        "O 4,HERO,HERO,HERO,HERO,SOLDIER,TRAITOR,CURSED,0,0",
+        "O 5,SOLDIER,SOLDIER,SOLDIER,SOLDIER,SOLDIER,SOLDIER,MAGE,0,0",
+        "O 6,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,SOLDIER,MAGE,0,0",
+        "O 7,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,CURSED,MAGE,0,0",
+        "O 8,HERO,CAPTAIN,CAPTAIN,CAPTAIN,CURSED,CURSED,MAGE,0,0",
+        "O 9,HERO,HERO,CAPTAIN,CAPTAIN,SOLDIER,TRAITOR,MAGE,0,0",
+        "O10,HERO,HERO,CAPTAIN,TRAITOR,TRAITOR,TRAITOR,MAGE,0,0",
+        "O11,HERO,HERO,CAPTAIN,CAPTAIN,TRAITOR,CURSED,MAGE,0,0",
+        "O12,HERO,HERO,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,0,0",
+        "O13,SOLDIER,CURSED,CURSED,MAGE,MAGE,MAGE,MAGE,0,0",
+        "O14,HERO,CAPTAIN,CAPTAIN,CURSED,MAGE,MAGE,MAGE,0,0",
+        "O15,HERO,SOLDIER,TRAITOR,TRAITOR,MAGE,MAGE,MAGE,0,0",
+        "O16,HERO,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,MAGE,WOLF,0",
+        "O17,HERO,CAPTAIN,CAPTAIN,CAPTAIN,SOLDIER,TRAITOR,MAGE,WOLF,0",
+        "O18,HERO,SOLDIER,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,WOLF,0",
+        "O19,HERO,SOLDIER,SOLDIER,CURSED,CURSED,CURSED,MAGE,SNAKE,0",
+        "O20,HERO,TRAITOR,TRAITOR,CURSED,MAGE,MAGE,MAGE,SNAKE,0",
+        "O21,HERO,HERO,CAPTAIN,TRAITOR,CURSED,MAGE,MAGE,SNAKE,0",
+        "O22,HERO,CAPTAIN,CAPTAIN,CAPTAIN,SOLDIER,SOLDIER,MAGE,HORSE,0",
+        "O23,HERO,HERO,CAPTAIN,CAPTAIN,SOLDIER,TRAITOR,MAGE,HORSE,0",
+        "O24,HERO,CAPTAIN,TRAITOR,CURSED,MAGE,MAGE,MAGE,HORSE,0",
+        "O25,SOLDIER,SOLDIER,SOLDIER,CURSED,CURSED,CURSED,MAGE,DRAGON,0",
+        "O26,HERO,HERO,HERO,HERO,TRAITOR,CURSED,MAGE,DRAGON,0",
+        "O27,HERO,HERO,CAPTAIN,SOLDIER,TRAITOR,MAGE,MAGE,DRAGON,0",
+        "O28,CAPTAIN,CAPTAIN,CAPTAIN,SOLDIER,CURSED,CURSED,MAGE,WILDBOAR,0",
+        "O29,HERO,HERO,TRAITOR,CURSED,CURSED,MAGE,MAGE,WILDBOAR,0",
+        "O30,HERO,TRAITOR,TRAITOR,CURSED,MAGE,MAGE,MAGE,WILDBOAR,0",
+        "O31,HERO,HERO,CAPTAIN,SOLDIER,CURSED,CURSED,MAGE,EAGLE,0",
+        "O32,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,TRAITOR,MAGE,EAGLE,0",
+        "O33,HERO,HERO,HERO,SOLDIER,TRAITOR,MAGE,MAGE,EAGLE,0",
+        "O34,HERO,HERO,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,HORSE,WILDBOAR",
+        "O35,SOLDIER,SOLDIER,CURSED,CURSED,CURSED,MAGE,MAGE,WOLF,DRAGON",
+        "O36,HERO,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,MAGE,HORSE,EAGLE",
+        "O37,HERO,SOLDIER,SOLDIER,TRAITOR,TRAITOR,MAGE,MAGE,DRAGON,WILDBOAR",
+        "O38,HERO,HERO,SOLDIER,TRAITOR,TRAITOR,TRAITOR,MAGE,SNAKE,EAGLE",
+        "O39,HERO,CAPTAIN,CAPTAIN,TRAITOR,MAGE,MAGE,MAGE,WILDBOAR,HORSE",
+        "O40,HERO,SOLDIER,SOLDIER,SOLDIER,CURSED,CURSED,MAGE,SNAKE,DRAGON",
+        "O41,HERO,HERO,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,WILDBOAR,EAGLE",
+        "O42,HERO,HERO,HERO,TRAITOR,TRAITOR,CURSED,MAGE,DRAGON,WILDBOAR",
         //43 = problem: not solvable!
-        { .a = { HERO, HERO, TRAITOR, CURSED, CURSED, MAGE, MAGE }, .m1 = WOLF, .m2 = WILDBOAR },
-        { .a = { SOLDIER, SOLDIER, SOLDIER, SOLDIER, SOLDIER, CAPTAIN, MAGE }, .m1 = WOLF, .m2 = SNAKE },
-        { .a = { CAPTAIN, SOLDIER, SOLDIER, SOLDIER, MAGE, MAGE, MAGE }, .m1 = HORSE, .m2 = EAGLE },
-        { .a = { HERO, HERO, CAPTAIN, SOLDIER, TRAITOR, CURSED, MAGE }, .m1 = WOLF, .m2 = WOLF },
-        { .a = { HERO, SOLDIER, SOLDIER, TRAITOR, TRAITOR, TRAITOR, MAGE }, .m1 = SNAKE, .m2 = WILDBOAR },
-        { .a = { HERO, HERO, TRAITOR, TRAITOR, TRAITOR, CURSED, MAGE }, .m1 = WOLF, .m2 = EAGLE },
-        { .a = { HERO, HERO, CAPTAIN, CAPTAIN, CAPTAIN, TRAITOR, MAGE }, .m1 = WOLF, .m2 = SNAKE },
-        { .a = { HERO, HERO, CAPTAIN, TRAITOR, MAGE, MAGE, MAGE }, .m1 = SNAKE, .m2 = HORSE },
-*/
-        // Coba
-        { .a = { POTTER, POTTER, POTTER, POTTER, POTTER, POTTER, PEASANT }, .m1 = 0, .m2 = 0 },
-        { .a = { POTTER, POTTER, PEASANT, PEASANT, PEASANT, PEASANT, SCRIBE }, .m1 = 0, .m2 = 0 },
-        { .a = { PEASANT, PEASANT, PEASANT, PEASANT, SCRIBE, SCRIBE, THIEF }, .m1 = 0, .m2 = 0 },
-        { .a = { POTTER, POTTER, POTTER, POTTER, PEASANT, PEASANT, SHAMAN }, .m1 = 0, .m2 = 0 },
-        { .a = { POTTER, POTTER, PEASANT, PEASANT, PEASANT, THIEF, QUEEN }, .m1 = 0, .m2 = 0 },
-        { .a = { POTTER, POTTER, POTTER, POTTER, PEASANT, THIEF, SHAMAN }, .m1 = 0, .m2 = 0 },
-        { .a = { POTTER, PEASANT, PEASANT, SCRIBE, SCRIBE, SCRIBE, QUEEN }, .m1 = 0, .m2 = 0 },
-        { .a = { POTTER, POTTER, POTTER, PEASANT, THIEF, SHAMAN, QUEEN }, .m1 = 0, .m2 = 0 },
-        { .a = { PEASANT, PEASANT, SCRIBE, SCRIBE, SCRIBE, SHAMAN, QUEEN }, .m1 = 0, .m2 = 0 },
-        { .a = { POTTER, SCRIBE, SCRIBE, THIEF, THIEF, SHAMAN, QUEEN }, .m1 = 0, .m2 = 0 },
-        { .a = { PEASANT, THIEF, THIEF, THIEF, SHAMAN, SHAMAN, QUEEN }, .m1 = 0, .m2 = 0 },
-        { .a = { POTTER, POTTER, PEASANT, THIEF, SHAMAN, QUEEN, QUEEN }, .m1 = 0, .m2 = 0 },
-        { .a = { PEASANT, SCRIBE, SCRIBE, SHAMAN, SHAMAN, QUEEN, QUEEN }, .m1 = 0, .m2 = 0 },
-        { .a = { POTTER, PEASANT, PEASANT, SHAMAN, SHAMAN, SHAMAN, QUEEN }, .m1 = 0, .m2 = 0 },
-        { .a = { SCRIBE, SCRIBE, THIEF, SHAMAN, SHAMAN, SHAMAN, QUEEN }, .m1 = 0, .m2 = 0 },
+        "O43,HERO,HERO,TRAITOR,CURSED,CURSED,MAGE,MAGE,WOLF,WILDBOAR",
+        "O44,SOLDIER,SOLDIER,SOLDIER,SOLDIER,SOLDIER,CAPTAIN,MAGE,WOLF,SNAKE",
+        "O45,CAPTAIN,SOLDIER,SOLDIER,SOLDIER,MAGE,MAGE,MAGE,HORSE,EAGLE",
+        "O46,HERO,HERO,CAPTAIN,SOLDIER,TRAITOR,CURSED,MAGE,WOLF,WOLF",
+        "O47,HERO,SOLDIER,SOLDIER,TRAITOR,TRAITOR,TRAITOR,MAGE,SNAKE,WILDBOAR",
+        "O48,HERO,HERO,TRAITOR,TRAITOR,TRAITOR,CURSED,MAGE,WOLF,EAGLE",
+        "O49,HERO,HERO,CAPTAIN,CAPTAIN,CAPTAIN,TRAITOR,MAGE,WOLF,SNAKE",
+        "O50,HERO,HERO,CAPTAIN,TRAITOR,MAGE,MAGE,MAGE,SNAKE,HORSE",
+
+        // Coba:
+        "C 1,POTTER,POTTER,POTTER,POTTER,POTTER,POTTER,PEASANT,0,0",
+        "C 2,POTTER,POTTER,PEASANT,PEASANT,PEASANT,PEASANT,SCRIBE,0,0",
+        "C 3,PEASANT,PEASANT,PEASANT,PEASANT,SCRIBE,SCRIBE,THIEF,0,0",
+        "C 4,POTTER,POTTER,POTTER,POTTER,PEASANT,PEASANT,SHAMAN,0,0",
+        "C 5,POTTER,POTTER,PEASANT,PEASANT,PEASANT,THIEF,QUEEN,0,0",
+        "C 6,POTTER,POTTER,POTTER,POTTER,PEASANT,THIEF,SHAMAN,0,0",
+        "C 7,POTTER,PEASANT,PEASANT,SCRIBE,SCRIBE,SCRIBE,QUEEN,0,0",
+        "C 8,POTTER,POTTER,POTTER,PEASANT,THIEF,SHAMAN,QUEEN,0,0",
+        "C 9,PEASANT,PEASANT,SCRIBE,SCRIBE,SCRIBE,SHAMAN,QUEEN,0,0",
+        "C10,POTTER,SCRIBE,SCRIBE,THIEF,THIEF,SHAMAN,QUEEN,0,0",
+        "C11,PEASANT,THIEF,THIEF,THIEF,SHAMAN,SHAMAN,QUEEN,0,0",
+        "C12,POTTER,POTTER,PEASANT,THIEF,SHAMAN,QUEEN,QUEEN,0,0",
+        "C13,PEASANT,SCRIBE,SCRIBE,SHAMAN,SHAMAN,QUEEN,QUEEN,0,0",
+        "C14,POTTER,PEASANT,PEASANT,SHAMAN,SHAMAN,SHAMAN,QUEEN,0,0",
+        "C15,SCRIBE,SCRIBE,THIEF,SHAMAN,SHAMAN,SHAMAN,QUEEN,0,0",
     };
-
-    for (int i = 0; i < sizeof(nums) / sizeof(nums[0]); i++) {
-        compute_dice_challenge(i + 1, nums[i]);
+    const int s_size = sizeof(s) / sizeof(s[0]);
+    for (int i = 0; i < s_size; i++) {
+        tuple_with_desc t_d = create_tuple_desc_from_string(s[i]);
+        compute_dice_challenge(t_d.desc, t_d.t);
     }
-
     return 0;
 }
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <time.h>
+//
+//#define HERO 1
+//#define CAPTAIN 2
+//#define SOLDIER 3
+//#define TRAITOR 4
+//#define CURSED 5
+//#define MAGE 6
+//
+//#define POTTER 13
+//#define PEASANT 14
+//#define SCRIBE 15
+//#define THIEF 16
+//#define SHAMAN 17
+//#define QUEEN 18
+//
+//#define NUM_DICE 7
+//#define NUM_SIDES 6
+//
+//int firstSet[NUM_SIDES] = {HERO, CAPTAIN, SOLDIER, TRAITOR, CURSED, MAGE};
+//int secondSet[NUM_SIDES] = {POTTER, PEASANT, SCRIBE, THIEF, SHAMAN, QUEEN};
+//
+//void nextCombination(int *combination, int len) {
+//    // Move to the next combination by incrementing like a number in base-NUM_SIDES
+//    for (int i = len - 1; i >= 0; --i) {
+//        if (++combination[i] >= NUM_SIDES) {
+//            combination[i] = 0;
+//        } else {
+//            break;
+//        }
+//    }
+//}
+//
+//void processCombination(const int *combination, int len, int current, int total) {
+//    if ((rand() % 50000000) == 0) {
+//        double percentage = 100.0 * current / total;
+//        printf("Progress: %.2f%%\n", percentage);
+//    }
+//    // Add any additional processing logic here...
+//}
+//
+//int main() {
+//    srand(time(NULL));
+//    int totalCombinations = 1;
+//    for (int i = 0; i < NUM_DICE * 2; i++) {
+//        totalCombinations *= NUM_SIDES;
+//    }
+//
+//    int *combination = (int *)calloc(NUM_DICE * 2, sizeof(int));
+//    if (combination == NULL) {
+//        perror("Memory allocation failed");
+//        return 1;
+//    }
+//
+//    for (int i = 0; i < totalCombinations; i++) {
+//        processCombination(combination, NUM_DICE * 2, i, totalCombinations);
+//        nextCombination(combination, NUM_DICE * 2);
+//    }
+//
+//    free(combination);
+//    return 0;
+//}

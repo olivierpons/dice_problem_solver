@@ -39,6 +39,11 @@ typedef struct {
 } tuple;
 
 typedef struct {
+    char desc[50];
+    tuple t;
+} tuple_with_desc;
+
+typedef struct {
     tuple a1;
     tuple a2;
     int m1;
@@ -48,5 +53,11 @@ typedef struct {
 #define NUM_ROLES 24
 
 extern const char *roleNames[];
+
+extern int string_const_to_int(const char* str);
+extern const char* number_to_const_string(int number);
+extern tuple create_tuple_from_string(const char* str);
+extern tuple_with_desc create_tuple_desc_from_string(const char* str);
+
 
 #endif // STRUCTS_H
