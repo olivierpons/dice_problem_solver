@@ -133,7 +133,7 @@ tuple create_tuple_from_string(const char* str) {
         token = strtok(NULL, ",");
     }
     if (count < 2) {
-        fprintf(stderr, "Not enough numbers for m1 and m2\n");
+        fprintf(stderr, "Not enough numbers for global_1 and global_2\n");
         free(temp_str);
         t.a[0] = -1;
         return t;

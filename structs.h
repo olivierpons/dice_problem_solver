@@ -38,8 +38,6 @@ typedef struct {
     int sum;
     int m1;
     int m2;
-    int m3;
-    int m4;
 } tuple;
 
 typedef struct {
@@ -50,10 +48,8 @@ typedef struct {
 typedef struct {
     tuple a1;
     tuple a2;
-    int m1;
-    int m2;
-    int m3;
-    int m4;
+    int global_1;
+    int global_2;
 } tuples;
 
 extern const char *roleNames[];

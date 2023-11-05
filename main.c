@@ -75,8 +75,8 @@ void add_tuple(
         *tps = (tuples *)realloc(*tps, (*capacity) * sizeof(tuples));
         memset(&((*tps)[*size]), 0, (*capacity - *size) * sizeof(tuples));
     }
-    (*tps)[*size].m1 = g1;
-    (*tps)[*size].m2 = g2;
+    (*tps)[*size].global_1 = g1;
+    (*tps)[*size].global_2 = g2;
     (*tps)[*size].a1 = *a1;
     (*tps)[*size].a2 = *a2;
     (*tps)[*size].a1.m1 = a1_m1;
@@ -159,7 +159,7 @@ void print_tuple(const tuple *tuple, const char *delimiter, const char *end) {
     printf("%s", end);
 }
 
-void comp_one_first(tuple *t) {
+void sum_one_pass_1(tuple *t) {
     memset(t->a_sum, 0, sizeof(int) * ARRAY_MAX_SIZE);
     calc_heroes(t);
     calc_captains(t);
@@ -184,7 +184,7 @@ void comp_one_first(tuple *t) {
     calc_scribe(t);
     calc_thief(t);
 }
-void comp_one_second(tuple *t) {
+void sum_one_pass_2(tuple *t) {
     calc_queen(t);
 //    calc_armadillo(t);
 //    calc_deer(t);
@@ -194,14 +194,14 @@ void comp_one_second(tuple *t) {
 //    calc_bee(t);
 }
 
-void comp_both(tuples *t, int v) {
+void sum_both(tuples *t, int v) {
     calc_wildboar(&t->a1, v);
     calc_wildboar(&t->a2, v);
     calc_wildboar_and_eagle(&t->a1, v);
     calc_wildboar_and_eagle(&t->a2, v);
 }
 
-void calc_sum(tuple *t) {
+void sum_final(tuple *t) {
     t->sum = 0;
     for (int i = 0; i < t->a_len; ++i) {
         t->sum = (int)(t->sum + t->a_sum[i]);
@@ -218,20 +218,23 @@ int has_fig(tuple *t, int v) {
 }
 
 #define MAX_MODIFIERS 4
-void process_modifiers(tuple *t, int both[], int one[]) {
-    int both_count = 0, one_count = 0;
-    int modifiers[MAX_MODIFIERS] = {t->m1, t->m2, t->m3, t->m4};
-
+void process_modifiers(
+    tuple *t, int both[], int *both_len, int one[], int *one_len
+) {
+    int modifiers[MAX_MODIFIERS] = {t->m1, t->m2, 0, 0};
+    *both_len = 0;
+    *one_len = 0;
     for (int i = 0; i < MAX_MODIFIERS; i++) {
         if (modifiers[i]) {
             if (modifiers[i] == WILDBOAR || modifiers[i] == EAGLE) {
-                both[both_count++] = modifiers[i];
+                both[(*both_len)++] = modifiers[i];
             } else {
-                one[one_count++] = modifiers[i];
+                one[(*one_len)++] = modifiers[i];
             }
         }
     }
 }
+
 
 void compute_dice_challenge(const char* description, tuple t) {
     int returnSize = 0;
@@ -242,8 +245,10 @@ void compute_dice_challenge(const char* description, tuple t) {
     int capacity = 0;
 
     int both[MAX_MODIFIERS] = {0};
+    int both_len;
     int one[MAX_MODIFIERS] = {0};
-    process_modifiers(&t, both, one);
+    int one_len;
+    process_modifiers(&t, both, &both_len, one, &one_len);
     int both_1 = 0, both_2 = 0, one_1 = 0, one_2 = 0;
     if (t.m1) {
         if (t.m1 == WILDBOAR || t.m1 == EAGLE) {
@@ -292,27 +297,27 @@ void compute_dice_challenge(const char* description, tuple t) {
             has_fig(&tps[i].a1, PEASANT) &&
             has_fig(&tps[i].a1, SHAMAN) &&
             has_fig(&tps[i].a1, QUEEN) &&
-            tps[i].a1.m1 != WOLF &&
-            tps[i].a1.m2 == WILDBOAR
+            tps[i].a1.global_1 != WOLF &&
+            tps[i].a1.global_2 == WILDBOAR
             ) {
             printf("here\n");
         }
         */
-        comp_one_first(&tps[i].a1);
-        comp_one_first(&tps[i].a2);
+        sum_one_pass_1(&tps[i].a1);
+        sum_one_pass_1(&tps[i].a2);
 
         calc_shaman(&tps[i].a1, tps[i].a2.a_len);
         calc_shaman(&tps[i].a2, tps[i].a1.a_len);
 
-        comp_one_second(&tps[i].a1);
-        comp_one_second(&tps[i].a2);
+        sum_one_pass_2(&tps[i].a1);
+        sum_one_pass_2(&tps[i].a2);
 
-        if (tps[i].m1) {
-            comp_both(&tps[i], tps[i].m1);
-            comp_both(&tps[i], tps[i].m2);
+        if (tps[i].global_1) {
+            sum_both(&tps[i], tps[i].global_1);
+            sum_both(&tps[i], tps[i].global_2);
         }
-        calc_sum(&tps[i].a1);
-        calc_sum(&tps[i].a2);
+        sum_final(&tps[i].a1);
+        sum_final(&tps[i].a2);
 
         if (tps[i].a1.sum == tps[i].a2.sum) { // (1) { //
             print_tuple(&tps[i].a1, ", ", " - ");
