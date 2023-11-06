@@ -33,7 +33,56 @@ const char *roleNames[] = {
     [BEE] = "Bee",
 };
 
+void print_role(int role) {
+    if (role >= NUM_ROLES || roleNames[role] == NULL) {
+        printf("Unknown: %d", (int)role);
+    } else {
+        printf("%s", roleNames[role]);
+    }
+}
 
+void print_tuple(
+    const tuple *t, const char *delimiter, const char *end, bool with_sum
+) {
+    printf("[");
+    for (int i = 0; i < t->a_len; ++i) {
+        print_role(t->a[i]);
+        if (i < t->a_len - 1) {
+            printf("%s", delimiter);
+        }
+    }
+    printf("]");
+    if (t->len_local > 0) {
+        printf(" (");
+        for (int i = 0; i < t->len_local; ++i) {
+            print_role(t->local[i]);
+            if (i < t->len_local - 1) {
+                printf("%s", delimiter);
+            }
+        }
+        printf(")");
+    }
+    if (with_sum) {
+        printf(" = %d", t->sum);
+    }
+    printf("%s", end);
+}
+
+void print_tuples(tuples* t, bool with_sum) {
+    print_tuple(&t->a1, ", ", " - ", with_sum);
+    print_tuple(&t->a2, ", ", "", with_sum);
+    if (t->len_global) {
+        printf(" - (");
+        for (int j = 0; j < t->len_global; ++j) {
+            print_role(t->global[j]);
+            if (j < t->len_global - 1) {
+                printf(", ");
+            }
+        }
+        printf(")");
+    }
+    printf("\n");
+}
 int string_const_to_int(const char* str) {
     if (strcmp(str, "HERO") == 0) return HERO;
     if (strcmp(str, "CAPTAIN") == 0) return CAPTAIN;

@@ -1,6 +1,8 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
+#include <stdbool.h>
+
 #define MAX_NORMAL (int)7
 
 #define HERO (int) 1
@@ -56,6 +58,11 @@ typedef struct {
 
 extern const char *roleNames[];
 
+extern void print_role(int role);
+extern void print_tuple(
+    const tuple *t, const char *delimiter, const char *end, bool with_sum
+);
+extern void print_tuples(tuples* t, bool with_sum);
 extern int string_const_to_int(const char* str);
 extern const char* number_to_const_string(int number);
 extern int has_value(tuple *t, int value);
