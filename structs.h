@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-#define MAX_NORMAL (int)7
 
 #define HERO (int) 1
 #define CAPTAIN (int) 2
@@ -31,6 +30,7 @@
 #define JAGUAR (int) 23
 #define BEE (int) 24
 
+#define MAX_NORMAL (int)7
 #define NUM_ROLES 24
 #define MAX_GLOBAL 4
 #define MAX_LOCAL MAX_GLOBAL
@@ -68,8 +68,8 @@ extern const char* number_to_const_string(int number);
 extern int has_value(tuple *t, int value);
 extern tuple create_tuple_from_string(const char* str);
 extern tuple_with_desc create_tuple_desc_from_string(const char* str);
-extern void process_modifiers(
-    tuple *t, int global[], int *global_len, int local[], int *local_len
-);
+extern int compare_ints(const void *a, const void *b);
+extern bool compare_arrays(int *arr1, int len1, int *arr2, int len2);
+extern bool tuple_exists(tuples *array, int array_len, tuples target);
 
 #endif // STRUCTS_H

@@ -34,6 +34,8 @@ const char *roleNames[] = {
 };
 
 void print_role(int role) {
+    printf("%d", (int)role);
+    return;
     if (role >= NUM_ROLES || roleNames[role] == NULL) {
         printf("Unknown: %d", (int)role);
     } else {
@@ -252,7 +254,6 @@ tuple_with_desc create_tuple_desc_from_string(const char* str) {
             strncpy(t_desc.desc, temp_desc, sizeof(t_desc.desc));
             t_desc.desc[sizeof(t_desc.desc) - 1] = '\0';
         }
-
         t_desc.t = create_tuple_from_string(comma_pos + 1);
     } else {
         fprintf(stderr, "No description found\n");
@@ -261,23 +262,33 @@ tuple_with_desc create_tuple_desc_from_string(const char* str) {
     return t_desc;
 }
 
-void process_modifiers(
-    tuple *t, int global[], int *global_len, int local[], int *local_len
-) {
-    int new_local[MAX_LOCAL];
-    int new_len_local = 0;
+int compare_ints(const void *a, const void *b) {
+    return (*(int*)a - *(int*)b);
+}
 
-    *global_len = 0;
-    *local_len = 0;
-
-    for (int i = 0; i < t->len_local; i++) {
-        if (t->local[i] == WILDBOAR || t->local[i] == EAGLE) {
-            global[(*global_len)++] = t->local[i];
-        } else {
-            local[(*local_len)++] = t->local[i];
-            new_local[new_len_local++] = t->local[i];
+bool compare_arrays(int *arr1, int len1, int *arr2, int len2) {
+    if (len1 != len2) {
+        return false;
+    }
+    qsort(arr1, len1, sizeof(int), compare_ints);
+    qsort(arr2, len2, sizeof(int), compare_ints);
+    for (int i = 0; i < len1; i++) {
+        if (arr1[i] != arr2[i]) {
+            return false;
         }
     }
-    memcpy(t->local, new_local, new_len_local * sizeof(t->local[0]));
-    t->len_local = new_len_local;
+    return true;
+}
+
+bool tuple_exists(tuples *array, int array_len, tuples target) {
+    for (int i = 0; i < array_len; i++) {
+        if (
+            compare_arrays(array[i].a1.a, array[i].a1.a_len, target.a1.a, target.a1.a_len) &&
+            compare_arrays(array[i].a2.a, array[i].a2.a_len, target.a2.a, target.a2.a_len) &&
+            compare_arrays(array[i].global, array[i].len_global, target.global, target.len_global)
+        ) {
+            return true;
+        }
+    }
+    return false;
 }

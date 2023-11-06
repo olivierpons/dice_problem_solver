@@ -52,7 +52,7 @@ void calc_mages(tuple *t) {
         if (t->a[i] == MAGE) {
             int s = 0;
             for (int j = 0; j < t->a_len; ++j) {
-                if (t->a[j] != MAGE) {
+                if (t->a[j] && (t->a[j] != MAGE)) {
                     s++;
                 }
             }
