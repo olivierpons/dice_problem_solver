@@ -415,7 +415,10 @@ bool next_permutation(int *array, int size) {
 
 
 
-void test_tuples(tuples** tps_ok, int* tps_size, int* tps_capacity, tuples* tps, int *globals, int len_globals) {
+void test_tuples(
+    tuples* tps, int *globals, int len_globals,
+    tuples** tps_ok, int* tps_size, int* tps_capacity
+) {
     sum_one_pass_1(&tps->a1);
     sum_one_pass_1(&tps->a2);
 
@@ -439,33 +442,41 @@ void test_tuples(tuples** tps_ok, int* tps_size, int* tps_capacity, tuples* tps,
     }
 }
 
-void distribute(tuples* tps, const int *array, int size, int cut) {
+void distribute(
+    tuples* tps, int cut,
+    const int *local, int len_local, int *global, int len_global,
+    tuples** tps_ok, int* tps_size, int* tps_cap
+) {
     tps->a1.len_local = cut;
-    tps->a2.len_local = size - cut;
+    tps->a2.len_local = len_local - cut;
     for (int i = 0; i < cut; i++) {
-        tps->a1.local[i] = array[i];
+        tps->a1.local[i] = local[i];
     }
-    for (int i = 0; i < size - cut; i++) {
-        tps->a2.local[i] = array[i + cut];
+    for (int i = 0; i < len_local - cut; i++) {
+        tps->a2.local[i] = local[i + cut];
     }
+    test_tuples(tps, global, len_global, tps_ok, tps_size, tps_cap);
 //    print_tuples(&tps, false);
 }
 
-void distribute_all(tuples* tps, int *third, int third_size) {
+void distribute_all(
+    tuples* tps,
+    int *local, int len_local, int *global, int len_global,
+    tuples** tps_ok, int* tps_size, int* tps_cap
+) {
     do {
-        for (int i = 0; i <= third_size; i++) {
-            distribute(tps, third, third_size, i);
+        for (int i = 0; i <= len_local; i++) {
+            distribute(tps, i, local, len_local, global, len_global, tps_ok, tps_size, tps_cap);
         }
-    } while (next_permutation(third, third_size));
+    } while (next_permutation(local, len_local));
 }
 
 
 void generate_all_groupings(
     const int *array, int size,
-    int *local, int len_local, int *global, int len_global
+    int *local, int len_local, int *global, int len_global,
+    tuples** tps_ok, int* tps_size, int* tps_cap
 ) {
-    tuples* tps_ok = NULL;
-    int tps_size = 0, tps_capacity = 0;
     tuples tps;
     for (int i = 0; i < size - 1; i++) {
         memset(&tps, 0, sizeof(tps));
@@ -476,35 +487,22 @@ void generate_all_groupings(
             tps.a2.a[tps.a2.a_len++] = array[j];
         }
         if (len_local) {
-            distribute_all(&tps, local, len_local);
+            distribute_all(
+                &tps, local, len_local, global, len_global,
+                tps_ok, tps_size, tps_cap
+            );
         } else {
-            test_tuples(&tps_ok, &tps_size, &tps_capacity, &tps, global, len_global);
+            test_tuples(&tps, global, len_global, tps_ok, tps_size, tps_cap);
 //            print_tuples(&tps, false);
         }
     }
-    for (int i = 0; i < tps_size; ++i) {
-        print_tuple(&tps_ok[i].a1, ", ", " - ", true);
-        print_tuple(&tps_ok[i].a2, ", ", "", true);
-        if (len_global > 0) {
-            printf(" - (");
-            for (int j = 0; j < len_global; ++j) {
-                print_role(global[j]);
-                if (j < len_global - 1) {
-                    printf(", ");
-                }
-            }
-            printf(")");
-        }
-        printf("\n");
-    }
-    free(tps_ok);
 }
 
 int main() {
     char *s[] = {
 //        "O 1,HERO,CAPTAIN,SOLDIER,TRAITOR, CURSED, 0,0",
-        "O 1,HERO,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,SOLDIER,0,0",
-//        "O47,HERO,SOLDIER,SOLDIER,TRAITOR,TRAITOR,TRAITOR,MAGE,SNAKE,SNAKE",
+//        "O 1,HERO,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,SOLDIER,0,0",
+        "O47,HERO,SOLDIER,SOLDIER,TRAITOR,TRAITOR,TRAITOR,MAGE,SNAKE,0",
     };
     const int s_size = sizeof(s) / sizeof(s[0]);
     for (int i = 0; i < s_size; i++) {
@@ -524,11 +522,31 @@ int main() {
             }
         }
 
+        tuples* tps_ok = NULL;
+        int tps_size = 0, tps_capacity = 0;
         do {
             generate_all_groupings(
-                t_d.t.a, t_d.t.a_len, local, len_local, globals, len_globals
+                t_d.t.a, t_d.t.a_len, local, len_local, globals, len_globals,
+                &tps_ok, &tps_size, &tps_capacity
             );
         } while (next_permutation(t_d.t.a, t_d.t.a_len));
+
+        for (int j = 0; j < tps_size; ++j) {
+            print_tuple(&tps_ok[j].a1, ", ", " - ", true);
+            print_tuple(&tps_ok[j].a2, ", ", "", true);
+            if (len_globals > 0) {
+                printf(" - (");
+                for (int k = 0; k < len_globals; ++k) {
+                    print_role(globals[k]);
+                    if (k < len_globals - 1) {
+                        printf(", ");
+                    }
+                }
+                printf(")");
+            }
+            printf("\n");
+        }
+        free(tps_ok);
 
     }
     return 0;
