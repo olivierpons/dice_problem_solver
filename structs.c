@@ -34,8 +34,8 @@ const char *roleNames[] = {
 };
 
 void print_role(int role) {
-    printf("%d", (int)role);
-    return;
+//    printf("%d", (int)role);
+//    return;
     if (role >= NUM_ROLES || roleNames[role] == NULL) {
         printf("Unknown: %d", (int)role);
     } else {
@@ -49,6 +49,9 @@ void print_tuple(
     printf("[");
     for (int i = 0; i < t->a_len; ++i) {
         print_role(t->a[i]);
+        if (with_sum) {
+            printf("/%d", t->a_sum[i]);
+        }
         if (i < t->a_len - 1) {
             printf("%s", delimiter);
         }
