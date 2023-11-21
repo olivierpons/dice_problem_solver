@@ -195,20 +195,22 @@ void test_tuples(
     }
 }
 
-void distribute_all(
+void distribute_local(
     tuples* tps,
     int *local, int len_local, int *global, int len_global,
     tuples** tps_found, int* tps_found_size, int* tps_found_capacity
 ) {
     int local_clean[MAX_LOCAL];
-    memcpy(local_clean, local, len_local * sizeof(int));
-    int len_local_clean = len_local;
+    int len_local_clean = 0;
     int nb_armadillos = 0;
-    for (int i = 0; i <= len_local; i++) {
+    for (int i = 0; i < len_local; ++i) {
         if (local[i] == ARMADILLO) {
             nb_armadillos++;
+        } else {
+            local_clean[len_local_clean++] = local[i];
         }
     }
+
     do {
         for (int i = 0; i <= len_local_clean; i++) {
             tps->a1.len_local = i;
@@ -219,10 +221,20 @@ void distribute_all(
             for (int j = 0; j < len_local_clean - i; j++) {
                 tps->a2.local[j] = local_clean[j + i];
             }
-            test_tuples(
-                tps, global, len_global,
-                tps_found, tps_found_size, tps_found_capacity
-            );
+            if (nb_armadillos) {
+                tuple *t = tps->a1.a_len > tps->a2.a_len ? &tps->a2 : &tps->a1;
+                for (int j = 0; j < nb_armadillos; j++) {
+                    t->local[t->len_local++] = ARMADILLO;
+                }
+            }
+            do {
+                do {
+                    test_tuples(
+                        tps, global, len_global,
+                        tps_found, tps_found_size, tps_found_capacity
+                    );
+                } while (next_permutation(tps->a2.local, tps->a2.len_local));
+            } while (next_permutation(tps->a1.local, tps->a1.len_local));
         }
     } while (next_permutation(local_clean, len_local_clean));
 }
@@ -243,7 +255,7 @@ void generate_all_groupings(
             tps.a2.a[tps.a2.a_len++] = array[j];
         }
         if (len_local) {
-            distribute_all(
+            distribute_local(
                 &tps, local, len_local, global, len_global,
                 tps_found, tps_found_size, tps_found_capacity
             );
