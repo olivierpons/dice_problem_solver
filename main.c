@@ -12,42 +12,49 @@ void swap(int *a, int *b) {
     *b = temp;
 }
 
+void count_elements(const int *array, int length, int *counts, int max_element) {
+    memset(counts, 0, max_element * sizeof(int));
+    for (int i = 0; i < length; ++i) {
+        if (array[i] > 0 && array[i] <= max_element) {
+            counts[array[i] - 1]++;
+        }
+    }
+}
+
 bool combination_exists(tuples *tps, int size, tuple *t1, tuple *t2) {
-    // Create temporary arrays to hold sorted values for comparison
-    int t1_a_sorted[MAX_NORMAL];
-    int t2_a_sorted[MAX_NORMAL];
-    int t1_local_sorted[MAX_LOCAL];
-    int t2_local_sorted[MAX_LOCAL];
+    int t1_a_counts[NUM_ROLES];
+    int t2_a_counts[NUM_ROLES];
+    int t1_local_counts[MAX_LOCAL];
+    int t2_local_counts[MAX_LOCAL];
 
-    // Copy and sort t1's arrays
-    memcpy(t1_a_sorted, t1->a, t1->a_len * sizeof(int));
-    qsort(t1_a_sorted, t1->a_len, sizeof(int), compare_ints);
+    count_elements(t1->a, t1->a_len, t1_a_counts, NUM_ROLES);
+    count_elements(t2->a, t2->a_len, t2_a_counts, NUM_ROLES);
+    count_elements(t1->local, t1->len_local, t1_local_counts, MAX_LOCAL);
+    count_elements(t2->local, t2->len_local, t2_local_counts, MAX_LOCAL);
 
-    memcpy(t1_local_sorted, t1->local, t1->len_local * sizeof(int));
-    qsort(t1_local_sorted, t1->len_local, sizeof(int), compare_ints);
-
-    // Copy and sort t2's arrays
-    memcpy(t2_a_sorted, t2->a, t2->a_len * sizeof(int));
-    qsort(t2_a_sorted, t2->a_len, sizeof(int), compare_ints);
-
-    memcpy(t2_local_sorted, t2->local, t2->len_local * sizeof(int));
-    qsort(t2_local_sorted, t2->len_local, sizeof(int), compare_ints);
-
-    // Check if there's a matching combination
     for (int i = 0; i < size; ++i) {
-        // No need to sort the arrays from tps, just compare with sorted t1 and t2
+        int tps_t1_a_counts[NUM_ROLES];
+        int tps_t2_a_counts[NUM_ROLES];
+        int tps_t1_local_counts[MAX_LOCAL];
+        int tps_t2_local_counts[MAX_LOCAL];
+
+        count_elements(tps[i].a1.a, tps[i].a1.a_len, tps_t1_a_counts, NUM_ROLES);
+        count_elements(tps[i].a2.a, tps[i].a2.a_len, tps_t2_a_counts, NUM_ROLES);
+        count_elements(tps[i].a1.local, tps[i].a1.len_local, tps_t1_local_counts, MAX_LOCAL);
+        count_elements(tps[i].a2.local, tps[i].a2.len_local, tps_t2_local_counts, MAX_LOCAL);
+
         bool match1 = (
-            memcmp(tps[i].a1.a, t1_a_sorted, t1->a_len * sizeof(int)) == 0 &&
-            memcmp(tps[i].a2.a, t2_a_sorted, t2->a_len * sizeof(int)) == 0 &&
-            memcmp(tps[i].a1.local, t1_local_sorted, t1->len_local * sizeof(int)) == 0 &&
-            memcmp(tps[i].a2.local, t2_local_sorted, t2->len_local * sizeof(int)) == 0
+            memcmp(t1_a_counts, tps_t1_a_counts, NUM_ROLES * sizeof(int)) == 0 &&
+            memcmp(t2_a_counts, tps_t2_a_counts, NUM_ROLES * sizeof(int)) == 0 &&
+            memcmp(t1_local_counts, tps_t1_local_counts, MAX_LOCAL * sizeof(int)) == 0 &&
+            memcmp(t2_local_counts, tps_t2_local_counts, MAX_LOCAL * sizeof(int)) == 0
         );
 
         bool match2 = (
-            memcmp(tps[i].a2.a, t1_a_sorted, t1->a_len * sizeof(int)) == 0 &&
-            memcmp(tps[i].a1.a, t2_a_sorted, t2->a_len * sizeof(int)) == 0 &&
-            memcmp(tps[i].a2.local, t1_local_sorted, t1->len_local * sizeof(int)) == 0 &&
-            memcmp(tps[i].a1.local, t2_local_sorted, t2->len_local * sizeof(int)) == 0
+            memcmp(t1_a_counts, tps_t2_a_counts, NUM_ROLES * sizeof(int)) == 0 &&
+            memcmp(t2_a_counts, tps_t1_a_counts, NUM_ROLES * sizeof(int)) == 0 &&
+            memcmp(t1_local_counts, tps_t2_local_counts, MAX_LOCAL * sizeof(int)) == 0 &&
+            memcmp(t2_local_counts, tps_t1_local_counts, MAX_LOCAL * sizeof(int)) == 0
         );
 
         if (match1 || match2) {
@@ -56,6 +63,7 @@ bool combination_exists(tuples *tps, int size, tuple *t1, tuple *t2) {
     }
     return false;
 }
+
 
 void add_tuple_once(
     tuples **tps, int *size, int *capacity, tuple *a1, tuple *a2,
@@ -187,35 +195,36 @@ void test_tuples(
     }
 }
 
-void distribute(
-    tuples* tps, int cut,
-    const int *local, int len_local, int *global, int len_global,
-    tuples** tps_ok, int* tps_size, int* tps_cap
-) {
-    tps->a1.len_local = cut;
-    tps->a2.len_local = len_local - cut;
-    for (int i = 0; i < cut; i++) {
-        tps->a1.local[i] = local[i];
-    }
-    for (int i = 0; i < len_local - cut; i++) {
-        tps->a2.local[i] = local[i + cut];
-    }
-    test_tuples(tps, global, len_global, tps_ok, tps_size, tps_cap);
-}
-
 void distribute_all(
     tuples* tps,
     int *local, int len_local, int *global, int len_global,
     tuples** tps_found, int* tps_found_size, int* tps_found_capacity
 ) {
+    int local_clean[MAX_LOCAL];
+    memcpy(local_clean, local, len_local * sizeof(int));
+    int len_local_clean = len_local;
+    int nb_armadillos = 0;
+    for (int i = 0; i <= len_local; i++) {
+        if (local[i] == ARMADILLO) {
+            nb_armadillos++;
+        }
+    }
     do {
-        for (int i = 0; i <= len_local; i++) {
-            distribute(
-                tps, i, local, len_local, global, len_global,
+        for (int i = 0; i <= len_local_clean; i++) {
+            tps->a1.len_local = i;
+            tps->a2.len_local = len_local_clean - i;
+            for (int j = 0; j < i; j++) {
+                tps->a1.local[j] = local_clean[j];
+            }
+            for (int j = 0; j < len_local_clean - i; j++) {
+                tps->a2.local[j] = local_clean[j + i];
+            }
+            test_tuples(
+                tps, global, len_global,
                 tps_found, tps_found_size, tps_found_capacity
             );
         }
-    } while (next_permutation(local, len_local));
+    } while (next_permutation(local_clean, len_local_clean));
 }
 
 
@@ -251,74 +260,74 @@ int main() {
     /* region problems */
     char *s[] = {
         // Odin:
-//        "O 1,HERO,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,SOLDIER,0,0",
-//        "O 2,HERO,HERO,CAPTAIN,CAPTAIN,CAPTAIN,CAPTAIN,TRAITOR,0,0",
-//        "O 3,HERO,HERO,HERO,CAPTAIN,CAPTAIN,CAPTAIN,CURSED,0,0",
-//        "O 4,HERO,HERO,HERO,HERO,SOLDIER,TRAITOR,CURSED,0,0",
-//        "O 5,SOLDIER,SOLDIER,SOLDIER,SOLDIER,SOLDIER,SOLDIER,MAGE,0,0",
-//        "O 6,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,SOLDIER,MAGE,0,0",
-//        "O 7,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,CURSED,MAGE,0,0",
-//        "O 8,HERO,CAPTAIN,CAPTAIN,CAPTAIN,CURSED,CURSED,MAGE,0,0",
-//        "O 9,HERO,HERO,CAPTAIN,CAPTAIN,SOLDIER,TRAITOR,MAGE,0,0",
-//        "O10,HERO,HERO,CAPTAIN,TRAITOR,TRAITOR,TRAITOR,MAGE,0,0",
-//        "O11,HERO,HERO,CAPTAIN,CAPTAIN,TRAITOR,CURSED,MAGE,0,0",
-//        "O12,HERO,HERO,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,0,0",
-//        "O13,SOLDIER,CURSED,CURSED,MAGE,MAGE,MAGE,MAGE,0,0",
-//        "O14,HERO,CAPTAIN,CAPTAIN,CURSED,MAGE,MAGE,MAGE,0,0",
-//        "O15,HERO,SOLDIER,TRAITOR,TRAITOR,MAGE,MAGE,MAGE,0,0",
-//        "O16,HERO,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,MAGE,WOLF,0",
-//        "O17,HERO,CAPTAIN,CAPTAIN,CAPTAIN,SOLDIER,TRAITOR,MAGE,WOLF,0",
-//        "O18,HERO,SOLDIER,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,WOLF,0",
-//        "O19,HERO,SOLDIER,SOLDIER,CURSED,CURSED,CURSED,MAGE,SNAKE,0",
-//        "O20,HERO,TRAITOR,TRAITOR,CURSED,MAGE,MAGE,MAGE,SNAKE,0",
-//        "O21,HERO,HERO,CAPTAIN,TRAITOR,CURSED,MAGE,MAGE,SNAKE,0",
-//        "O22,HERO,CAPTAIN,CAPTAIN,CAPTAIN,SOLDIER,SOLDIER,MAGE,HORSE,0",
-//        "O23,HERO,HERO,CAPTAIN,CAPTAIN,SOLDIER,TRAITOR,MAGE,HORSE,0",
-//        "O24,HERO,CAPTAIN,TRAITOR,CURSED,MAGE,MAGE,MAGE,HORSE,0",
-//        "O25,SOLDIER,SOLDIER,SOLDIER,CURSED,CURSED,CURSED,MAGE,DRAGON,0",
-//        "O26,HERO,HERO,HERO,HERO,TRAITOR,CURSED,MAGE,DRAGON,0",
-//        "O27,HERO,HERO,CAPTAIN,SOLDIER,TRAITOR,MAGE,MAGE,DRAGON,0",
-//        "O28,CAPTAIN,CAPTAIN,CAPTAIN,SOLDIER,CURSED,CURSED,MAGE,WILDBOAR,0",
-//        "O29,HERO,HERO,TRAITOR,CURSED,CURSED,MAGE,MAGE,WILDBOAR,0",
-//        "O30,HERO,TRAITOR,TRAITOR,CURSED,MAGE,MAGE,MAGE,WILDBOAR,0",
-//        "O31,HERO,HERO,CAPTAIN,SOLDIER,CURSED,CURSED,MAGE,EAGLE,0",
-//        "O32,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,TRAITOR,MAGE,EAGLE,0",
-//        "O33,HERO,HERO,HERO,SOLDIER,TRAITOR,MAGE,MAGE,EAGLE,0",
-//        "O34,HERO,HERO,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,HORSE,WILDBOAR",
-//        "O35,SOLDIER,SOLDIER,CURSED,CURSED,CURSED,MAGE,MAGE,WOLF,DRAGON",
-//        "O36,HERO,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,MAGE,HORSE,EAGLE",
-//        "O37,HERO,SOLDIER,SOLDIER,TRAITOR,TRAITOR,MAGE,MAGE,DRAGON,WILDBOAR",
-//        "O38,HERO,HERO,SOLDIER,TRAITOR,TRAITOR,TRAITOR,MAGE,SNAKE,EAGLE",
-//        "O39,HERO,CAPTAIN,CAPTAIN,TRAITOR,MAGE,MAGE,MAGE,WILDBOAR,HORSE",
-//        "O40,HERO,SOLDIER,SOLDIER,SOLDIER,CURSED,CURSED,MAGE,SNAKE,DRAGON",
-//        "O41,HERO,HERO,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,WILDBOAR,EAGLE",
-//        "O42,HERO,HERO,HERO,TRAITOR,TRAITOR,CURSED,MAGE,DRAGON,WILDBOAR",
-//        //43 = problem: not solvable!
-//        "O43,HERO,HERO,TRAITOR,CURSED,CURSED,MAGE,MAGE,WOLF,WILDBOAR",
+        "O 1,HERO,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,SOLDIER,0,0",
+        "O 2,HERO,HERO,CAPTAIN,CAPTAIN,CAPTAIN,CAPTAIN,TRAITOR,0,0",
+        "O 3,HERO,HERO,HERO,CAPTAIN,CAPTAIN,CAPTAIN,CURSED,0,0",
+        "O 4,HERO,HERO,HERO,HERO,SOLDIER,TRAITOR,CURSED,0,0",
+        "O 5,SOLDIER,SOLDIER,SOLDIER,SOLDIER,SOLDIER,SOLDIER,MAGE,0,0",
+        "O 6,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,SOLDIER,MAGE,0,0",
+        "O 7,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,CURSED,MAGE,0,0",
+        "O 8,HERO,CAPTAIN,CAPTAIN,CAPTAIN,CURSED,CURSED,MAGE,0,0",
+        "O 9,HERO,HERO,CAPTAIN,CAPTAIN,SOLDIER,TRAITOR,MAGE,0,0",
+        "O10,HERO,HERO,CAPTAIN,TRAITOR,TRAITOR,TRAITOR,MAGE,0,0",
+        "O11,HERO,HERO,CAPTAIN,CAPTAIN,TRAITOR,CURSED,MAGE,0,0",
+        "O12,HERO,HERO,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,0,0",
+        "O13,SOLDIER,CURSED,CURSED,MAGE,MAGE,MAGE,MAGE,0,0",
+        "O14,HERO,CAPTAIN,CAPTAIN,CURSED,MAGE,MAGE,MAGE,0,0",
+        "O15,HERO,SOLDIER,TRAITOR,TRAITOR,MAGE,MAGE,MAGE,0,0",
+        "O16,HERO,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,MAGE,WOLF,0",
+        "O17,HERO,CAPTAIN,CAPTAIN,CAPTAIN,SOLDIER,TRAITOR,MAGE,WOLF,0",
+        "O18,HERO,SOLDIER,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,WOLF,0",
+        "O19,HERO,SOLDIER,SOLDIER,CURSED,CURSED,CURSED,MAGE,SNAKE,0",
+        "O20,HERO,TRAITOR,TRAITOR,CURSED,MAGE,MAGE,MAGE,SNAKE,0",
+        "O21,HERO,HERO,CAPTAIN,TRAITOR,CURSED,MAGE,MAGE,SNAKE,0",
+        "O22,HERO,CAPTAIN,CAPTAIN,CAPTAIN,SOLDIER,SOLDIER,MAGE,HORSE,0",
+        "O23,HERO,HERO,CAPTAIN,CAPTAIN,SOLDIER,TRAITOR,MAGE,HORSE,0",
+        "O24,HERO,CAPTAIN,TRAITOR,CURSED,MAGE,MAGE,MAGE,HORSE,0",
+        "O25,SOLDIER,SOLDIER,SOLDIER,CURSED,CURSED,CURSED,MAGE,DRAGON,0",
+        "O26,HERO,HERO,HERO,HERO,TRAITOR,CURSED,MAGE,DRAGON,0",
+        "O27,HERO,HERO,CAPTAIN,SOLDIER,TRAITOR,MAGE,MAGE,DRAGON,0",
+        "O28,CAPTAIN,CAPTAIN,CAPTAIN,SOLDIER,CURSED,CURSED,MAGE,WILDBOAR,0",
+        "O29,HERO,HERO,TRAITOR,CURSED,CURSED,MAGE,MAGE,WILDBOAR,0",
+        "O30,HERO,TRAITOR,TRAITOR,CURSED,MAGE,MAGE,MAGE,WILDBOAR,0",
+        "O31,HERO,HERO,CAPTAIN,SOLDIER,CURSED,CURSED,MAGE,EAGLE,0",
+        "O32,HERO,HERO,CAPTAIN,SOLDIER,SOLDIER,TRAITOR,MAGE,EAGLE,0",
+        "O33,HERO,HERO,HERO,SOLDIER,TRAITOR,MAGE,MAGE,EAGLE,0",
+        "O34,HERO,HERO,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,HORSE,WILDBOAR",
+        "O35,SOLDIER,SOLDIER,CURSED,CURSED,CURSED,MAGE,MAGE,WOLF,DRAGON",
+        "O36,HERO,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,MAGE,HORSE,EAGLE",
+        "O37,HERO,SOLDIER,SOLDIER,TRAITOR,TRAITOR,MAGE,MAGE,DRAGON,WILDBOAR",
+        "O38,HERO,HERO,SOLDIER,TRAITOR,TRAITOR,TRAITOR,MAGE,SNAKE,EAGLE",
+        "O39,HERO,CAPTAIN,CAPTAIN,TRAITOR,MAGE,MAGE,MAGE,WILDBOAR,HORSE",
+        "O40,HERO,SOLDIER,SOLDIER,SOLDIER,CURSED,CURSED,MAGE,SNAKE,DRAGON",
+        "O41,HERO,HERO,SOLDIER,SOLDIER,TRAITOR,MAGE,MAGE,WILDBOAR,EAGLE",
+        "O42,HERO,HERO,HERO,TRAITOR,TRAITOR,CURSED,MAGE,DRAGON,WILDBOAR",
+        //43 = problem: not solvable!
+        "O43,HERO,HERO,TRAITOR,CURSED,CURSED,MAGE,MAGE,WOLF,WILDBOAR",
         "O44,SOLDIER,SOLDIER,SOLDIER,SOLDIER,SOLDIER,CAPTAIN,MAGE,WOLF,SNAKE",
-//        "O45,CAPTAIN,SOLDIER,SOLDIER,SOLDIER,MAGE,MAGE,MAGE,HORSE,EAGLE",
-//        "O46,HERO,HERO,CAPTAIN,SOLDIER,TRAITOR,CURSED,MAGE,WOLF,WOLF",
-//        "O47,HERO,SOLDIER,SOLDIER,TRAITOR,TRAITOR,TRAITOR,MAGE,SNAKE,WILDBOAR",
-//        "O48,HERO,HERO,TRAITOR,TRAITOR,TRAITOR,CURSED,MAGE,WOLF,EAGLE",
-//        "O49,HERO,HERO,CAPTAIN,CAPTAIN,CAPTAIN,TRAITOR,MAGE,WOLF,SNAKE",
-//        "O50,HERO,HERO,CAPTAIN,TRAITOR,MAGE,MAGE,MAGE,SNAKE,HORSE",
-//
-//        // Coba:
-//        "C 1,POTTER,POTTER,POTTER,POTTER,POTTER,POTTER,PEASANT,0,0",
-//        "C 2,POTTER,POTTER,PEASANT,PEASANT,PEASANT,PEASANT,SCRIBE,0,0",
-//        "C 3,PEASANT,PEASANT,PEASANT,PEASANT,SCRIBE,SCRIBE,THIEF,0,0",
-//        "C 4,POTTER,POTTER,POTTER,POTTER,PEASANT,PEASANT,SHAMAN,0,0",
-//        "C 5,POTTER,POTTER,PEASANT,PEASANT,PEASANT,THIEF,QUEEN,0,0",
-//        "C 6,POTTER,POTTER,POTTER,POTTER,PEASANT,THIEF,SHAMAN,0,0",
-//        "C 7,POTTER,PEASANT,PEASANT,SCRIBE,SCRIBE,SCRIBE,QUEEN,0,0",
-//        "C 8,POTTER,POTTER,POTTER,PEASANT,THIEF,SHAMAN,QUEEN,0,0",
-//        "C 9,PEASANT,PEASANT,SCRIBE,SCRIBE,SCRIBE,SHAMAN,QUEEN,0,0",
-//        "C10,POTTER,SCRIBE,SCRIBE,THIEF,THIEF,SHAMAN,QUEEN,0,0",
-//        "C11,PEASANT,THIEF,THIEF,THIEF,SHAMAN,SHAMAN,QUEEN,0,0",
-//        "C12,POTTER,POTTER,PEASANT,THIEF,SHAMAN,QUEEN,QUEEN,0,0",
-//        "C13,PEASANT,SCRIBE,SCRIBE,SHAMAN,SHAMAN,QUEEN,QUEEN,0,0",
-//        "C14,POTTER,PEASANT,PEASANT,SHAMAN,SHAMAN,SHAMAN,QUEEN,0,0",
-//        "C15,SCRIBE,SCRIBE,THIEF,SHAMAN,SHAMAN,SHAMAN,QUEEN,0,0",
+        "O45,CAPTAIN,SOLDIER,SOLDIER,SOLDIER,MAGE,MAGE,MAGE,HORSE,EAGLE",
+        "O46,HERO,HERO,CAPTAIN,SOLDIER,TRAITOR,CURSED,MAGE,WOLF,WOLF",
+        "O47,HERO,SOLDIER,SOLDIER,TRAITOR,TRAITOR,TRAITOR,MAGE,SNAKE,WILDBOAR",
+        "O48,HERO,HERO,TRAITOR,TRAITOR,TRAITOR,CURSED,MAGE,WOLF,EAGLE",
+        "O49,HERO,HERO,CAPTAIN,CAPTAIN,CAPTAIN,TRAITOR,MAGE,WOLF,SNAKE",
+        "O50,HERO,HERO,CAPTAIN,TRAITOR,MAGE,MAGE,MAGE,SNAKE,HORSE",
+
+        // Coba:
+        "C 1,POTTER,POTTER,POTTER,POTTER,POTTER,POTTER,PEASANT,0,0",
+        "C 2,POTTER,POTTER,PEASANT,PEASANT,PEASANT,PEASANT,SCRIBE,0,0",
+        "C 3,PEASANT,PEASANT,PEASANT,PEASANT,SCRIBE,SCRIBE,THIEF,0,0",
+        "C 4,POTTER,POTTER,POTTER,POTTER,PEASANT,PEASANT,SHAMAN,0,0",
+        "C 5,POTTER,POTTER,PEASANT,PEASANT,PEASANT,THIEF,QUEEN,0,0",
+        "C 6,POTTER,POTTER,POTTER,POTTER,PEASANT,THIEF,SHAMAN,0,0",
+        "C 7,POTTER,PEASANT,PEASANT,SCRIBE,SCRIBE,SCRIBE,QUEEN,0,0",
+        "C 8,POTTER,POTTER,POTTER,PEASANT,THIEF,SHAMAN,QUEEN,0,0",
+        "C 9,PEASANT,PEASANT,SCRIBE,SCRIBE,SCRIBE,SHAMAN,QUEEN,0,0",
+        "C10,POTTER,SCRIBE,SCRIBE,THIEF,THIEF,SHAMAN,QUEEN,0,0",
+        "C11,PEASANT,THIEF,THIEF,THIEF,SHAMAN,SHAMAN,QUEEN,0,0",
+        "C12,POTTER,POTTER,PEASANT,THIEF,SHAMAN,QUEEN,QUEEN,0,0",
+        "C13,PEASANT,SCRIBE,SCRIBE,SHAMAN,SHAMAN,QUEEN,QUEEN,0,0",
+        "C14,POTTER,PEASANT,PEASANT,SHAMAN,SHAMAN,SHAMAN,QUEEN,0,0",
+        "C15,SCRIBE,SCRIBE,THIEF,SHAMAN,SHAMAN,SHAMAN,QUEEN,0,0",
     };
     /* endregion problems */
 
