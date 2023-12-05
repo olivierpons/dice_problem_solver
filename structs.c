@@ -28,7 +28,7 @@ const char *roleNames[] = {
     [ARMADILLO] = "Armadillo",
     [DEER] = "Deer",
     [IGUANA] = "Iguana",
-    [SCORPION] = "Scorpion",
+    [SCORPIO] = "Scorpion",
     [JAGUAR] = "Jaguar",
     [BEE] = "Bee",
 };
@@ -36,7 +36,7 @@ const char *roleNames[] = {
 void print_role(int role) {
 //    printf("%d", (int)role);
 //    return;
-    if (role >= NUM_ROLES || roleNames[role] == NULL) {
+    if (role > NUM_ROLES || roleNames[role] == NULL) {
         printf("Unknown: %d", (int)role);
     } else {
         printf("%s", roleNames[role]);
@@ -110,7 +110,7 @@ int string_const_to_int(const char* str) {
     if (strcmp(str, "ARMADILLO") == 0) return ARMADILLO;
     if (strcmp(str, "DEER") == 0) return DEER;
     if (strcmp(str, "IGUANA") == 0) return IGUANA;
-    if (strcmp(str, "SCORPION") == 0) return SCORPION;
+    if (strcmp(str, "SCORPIO") == 0) return SCORPIO;
     if (strcmp(str, "JAGUAR") == 0) return JAGUAR;
     if (strcmp(str, "BEE") == 0) return BEE;
 
@@ -156,7 +156,7 @@ NumberStringMapping mappings[] = {
     {ARMADILLO, "ARMADILLO"},
     {DEER, "DEER"},
     {IGUANA, "IGUANA"},
-    {SCORPION, "SCORPION"},
+    {SCORPIO, "SCORPIO"},
     {JAGUAR, "JAGUAR"},
     {BEE, "BEE"},
     {0, NULL}
@@ -208,7 +208,7 @@ tuple create_tuple_from_string(const char* str) {
     while (token != NULL) {
         while (*token == ' ') token++;
         int v = string_const_to_int(token);
-        if ( v &&
+        if (v &&
             (v != WOLF) &&
             (v != SNAKE) &&
             (v != HORSE) &&
@@ -218,7 +218,7 @@ tuple create_tuple_from_string(const char* str) {
             (v != ARMADILLO) &&
             (v != DEER) &&
             (v != IGUANA) &&
-            (v != SCORPION) &&
+            (v != SCORPIO) &&
             (v != JAGUAR) &&
             (v != BEE)
             ) {
@@ -234,14 +234,13 @@ tuple create_tuple_from_string(const char* str) {
 }
 
 
-tuple_with_desc create_tuple_desc_from_string(const char* str) {
-    tuple_with_desc t_desc;
-    memset(&t_desc, 0, sizeof(t_desc));
+void create_tuple_desc_from_string(tuple_with_desc *t_d, const char* str) {
+    memset(t_d, 0, sizeof(tuple_with_desc));
 
     char* temp_str = strdup(str);
     if (!temp_str) {
         fprintf(stderr, "Memory allocation error\n");
-        return t_desc;
+        return;
     }
     char* comma_pos = strchr(temp_str, ',');
     if (comma_pos != NULL) {
@@ -250,19 +249,18 @@ tuple_with_desc create_tuple_desc_from_string(const char* str) {
         strncpy(temp_desc, temp_str, desc_len);
         temp_desc[desc_len] = '\0';
         if (strncmp(temp_desc, "O", 1) == 0 && strlen(temp_desc) == 3) {
-            sprintf(t_desc.desc, "Odin %s", temp_desc + 1);
+            sprintf(t_d->desc, "Odin %s", temp_desc + 1);
         } else if (strncmp(temp_desc, "C", 1) == 0 && strlen(temp_desc) == 3) {
-            sprintf(t_desc.desc, "Coba %s", temp_desc + 1);
+            sprintf(t_d->desc, "Coba %s", temp_desc + 1);
         } else {
-            strncpy(t_desc.desc, temp_desc, sizeof(t_desc.desc));
-            t_desc.desc[sizeof(t_desc.desc) - 1] = '\0';
+            strncpy(t_d->desc, temp_desc, sizeof(t_d->desc));
+            t_d->desc[sizeof(t_d->desc) - 1] = '\0';
         }
-        t_desc.t = create_tuple_from_string(comma_pos + 1);
+        t_d->t = create_tuple_from_string(comma_pos + 1);
     } else {
         fprintf(stderr, "No description found\n");
     }
     free(temp_str);
-    return t_desc;
 }
 
 int compare_ints(const void *a, const void *b) {

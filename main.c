@@ -125,12 +125,12 @@ void sum_one_pass_1(tuple *t) {
 
 void sum_one_pass_2(tuple *t) {
     calc_queen(t);
-//    calc_armadillo(t);
-//    calc_deer(t);
-//    calc_iguana(t);
-//    calc_scorpion(t);
-//    calc_jaguar(t);
-//    calc_bee(t);
+    calc_armadillo(t);
+    calc_deer(t);
+    calc_iguana(t);
+    calc_scorpio(t);
+    calc_jaguar(t);
+    calc_bee(t);
 }
 
 void sum_both(tuples *t, int v) {
@@ -197,15 +197,18 @@ void test_tuples(
 
 void distribute_local(
     tuples* tps,
-    int *local, int len_local, int *global, int len_global,
+    const int *local, int len_local, int *global, int len_global,
     tuples** tps_found, int* tps_found_size, int* tps_found_capacity
 ) {
     int local_clean[MAX_LOCAL];
     int len_local_clean = 0;
     int nb_armadillos = 0;
+    int nb_deers = 0;
     for (int i = 0; i < len_local; ++i) {
         if (local[i] == ARMADILLO) {
             nb_armadillos++;
+        } else if (local[i] == DEER) {
+            nb_deers++;
         } else {
             local_clean[len_local_clean++] = local[i];
         }
@@ -218,22 +221,44 @@ void distribute_local(
             for (int j = 0; j < i; j++) {
                 tps->a1.local[j] = local_clean[j];
             }
-            for (int j = 0; j < len_local_clean - i; j++) {
+            for (int j = 0; j < tps->a2.len_local; j++) {
                 tps->a2.local[j] = local_clean[j + i];
             }
-            if (nb_armadillos) {
+            if (nb_armadillos || nb_deers) {
+                /* If armadillos / deers, we need to have different lengths: */
+                if (tps->a1.a_len == tps->a2.a_len) {
+                    return;
+                }
+                /* Armadillo = goes to the smallest group: */
                 tuple *t = tps->a1.a_len > tps->a2.a_len ? &tps->a2 : &tps->a1;
                 for (int j = 0; j < nb_armadillos; j++) {
                     t->local[t->len_local++] = ARMADILLO;
                 }
+                /* Deer = goes to the biggest group: */
+                t = tps->a1.a_len > tps->a2.a_len ? &tps->a1 : &tps->a2;
+                for (int j = 0; j < nb_deers; j++) {
+                    t->local[t->len_local++] = DEER;
+                }
             }
+            int a2_base[MAX_LOCAL];
+            memcpy(a2_base, tps->a2.local, tps->a2.len_local * sizeof(int));
             do {
                 do {
+                    /* To breakpoint for debugging:
+                    if (tps->a1.a_len == 3 &&
+                        tps->a1.a[0] == PEASANT &&
+                        tps->a1.a[1] == SCRIBE &&
+                        tps->a1.a[2] == SCRIBE &&
+                        tps->a1.len_local == 2
+                        ) {
+                        print_tuples(tps, false);
+                    } */
                     test_tuples(
                         tps, global, len_global,
                         tps_found, tps_found_size, tps_found_capacity
                     );
                 } while (next_permutation(tps->a2.local, tps->a2.len_local));
+                memcpy(tps->a2.local, a2_base, tps->a2.len_local * sizeof(int));
             } while (next_permutation(tps->a1.local, tps->a1.len_local));
         }
     } while (next_permutation(local_clean, len_local_clean));
@@ -340,12 +365,50 @@ int main() {
         "C13,PEASANT,SCRIBE,SCRIBE,SHAMAN,SHAMAN,QUEEN,QUEEN,0,0",
         "C14,POTTER,PEASANT,PEASANT,SHAMAN,SHAMAN,SHAMAN,QUEEN,0,0",
         "C15,SCRIBE,SCRIBE,THIEF,SHAMAN,SHAMAN,SHAMAN,QUEEN,0,0",
+        // "CEx,POTTER,POTTER,PEASANT,PEASANT,THIEF,THIEF,QUEEN,ARMADILLO,0",
+        "C16,PEASANT,PEASANT,PEASANT,PEASANT,THIEF,THIEF,SHAMAN,ARMADILLO,0",
+        "C17,POTTER,POTTER,SCRIBE,SCRIBE,SCRIBE,SHAMAN,SHAMAN,ARMADILLO,0",
+        "C18,PEASANT,SCRIBE,THIEF,SHAMAN,QUEEN,QUEEN,QUEEN,ARMADILLO,0",
+        // "CEx,POTTER,POTTER,POTTER,POTTER,PEASANT,PEASANT,QUEEN,DEER,0",
+        "C19,POTTER,THIEF,THIEF,THIEF,SHAMAN,SHAMAN,SHAMAN,DEER,0",
+        "C20,POTTER,POTTER,PEASANT,SHAMAN,SHAMAN,QUEEN,QUEEN,DEER,0",
+        "C21,POTTER,SCRIBE,SCRIBE,THIEF,THIEF,SHAMAN,QUEEN,DEER,0",
+        "C22,POTTER,PEASANT,PEASANT,PEASANT,PEASANT,THIEF,SHAMAN,IGUANA,0",
+        "C23,PEASANT,THIEF,THIEF,THIEF,THIEF,SHAMAN,QUEEN,IGUANA,0",
+        "C24,PEASANT,SCRIBE,SCRIBE,SCRIBE,SHAMAN,SHAMAN,QUEEN,IGUANA,0",
+        "C25,POTTER,POTTER,POTTER,PEASANT,PEASANT,SHAMAN,SHAMAN,SCORPIO,0",
+        "C26,POTTER,POTTER,PEASANT,SHAMAN,QUEEN,QUEEN,QUEEN,SCORPIO,0",
+        "C27,POTTER,POTTER,SCRIBE,SCRIBE,SHAMAN,SHAMAN,QUEEN,SCORPIO,0",
+        "C28,PEASANT,THIEF,THIEF,THIEF,THIEF,SHAMAN,SHAMAN,JAGUAR,0",
+        "C29,PEASANT,THIEF,THIEF,SHAMAN,SHAMAN,QUEEN,QUEEN,JAGUAR,0",
+        "C30,POTTER,SCRIBE,SCRIBE,THIEF,SHAMAN,QUEEN,QUEEN,JAGUAR,0",
+        "C31,POTTER,PEASANT,PEASANT,PEASANT,THIEF,THIEF,SHAMAN,BEE,0",
+        "C32,POTTER,THIEF,THIEF,THIEF,SHAMAN,SHAMAN,QUEEN,BEE,0",
+        "C33,SCRIBE,SCRIBE,THIEF,SHAMAN,SHAMAN,QUEEN,QUEEN,BEE,0",
+        "C34,POTTER,POTTER,SCRIBE,SCRIBE,SCRIBE,SHAMAN,SHAMAN,ARMADILLO,JAGUAR",
+        "C35,POTTER,PEASANT,PEASANT,PEASANT,PEASANT,SCRIBE,SHAMAN,DEER,IGUANA",
+        "C36,SCRIBE,SCRIBE,SCRIBE,SCRIBE,SHAMAN,SHAMAN,SHAMAN,SCORPIO,BEE",
+        "C37,POTTER,THIEF,THIEF,SHAMAN,QUEEN,QUEEN,QUEEN,ARMADILLO,IGUANA",
+        "C38,PEASANT,THIEF,THIEF,THIEF,SHAMAN,QUEEN,QUEEN,JAGUAR,BEE",
+        "C39,SCRIBE,THIEF,THIEF,SHAMAN,SHAMAN,SHAMAN,QUEEN,ARMADILLO,DEER",
+        "C40,PEASANT,THIEF,THIEF,THIEF,SHAMAN,QUEEN,QUEEN,ARMADILLO,SCORPIO",
+        "C41,POTTER,POTTER,POTTER,POTTER,SHAMAN,QUEEN,QUEEN,DEER,JAGUAR",
+        "C42,PEASANT,SCRIBE,SCRIBE,SHAMAN,SHAMAN,SHAMAN,QUEEN,SCORPIO,SCORPIO",
+        "C43,POTTER,POTTER,SCRIBE,SCRIBE,SHAMAN,QUEEN,QUEEN,ARMADILLO,IGUANA",
+        "C44,SCRIBE,SCRIBE,THIEF,SHAMAN,QUEEN,QUEEN,QUEEN,DEER,BEE",
+        "C45,PEASANT,PEASANT,SHAMAN,SHAMAN,SHAMAN,QUEEN,QUEEN,SCORPIO,JAGUAR",
+        "C46,PEASANT,SCRIBE,THIEF,THIEF,THIEF,SHAMAN,QUEEN,IGUANA,IGUANA",
+        "C47,POTTER,POTTER,SCRIBE,SHAMAN,SHAMAN,SHAMAN,QUEEN,ARMADILLO,BEE",
+        "C48,POTTER,SCRIBE,THIEF,SHAMAN,SHAMAN,SHAMAN,QUEEN,BEE,BEE",
+        "C49,SCRIBE,SCRIBE,SCRIBE,THIEF,SHAMAN,SHAMAN,QUEEN,DEER,IGUANA",
+        "C50,SCRIBE,SCRIBE,SHAMAN,QUEEN,QUEEN,QUEEN,QUEEN,SCORPIO,BEE",
     };
     /* endregion problems */
 
     const int s_size = sizeof(s) / sizeof(s[0]);
     for (int i = 0; i < s_size; i++) {
-        tuple_with_desc t_d = create_tuple_desc_from_string(s[i]);
+        tuple_with_desc t_d;
+        create_tuple_desc_from_string(&t_d, s[i]);
 
         int globals[MAX_GLOBAL] = {0};
         int len_globals = 0;

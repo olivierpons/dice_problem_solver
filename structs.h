@@ -26,7 +26,7 @@
 #define ARMADILLO (int) 19
 #define DEER (int) 20
 #define IGUANA (int) 21
-#define SCORPION (int) 22
+#define SCORPIO (int) 22
 #define JAGUAR (int) 23
 #define BEE (int) 24
 
@@ -45,7 +45,7 @@ typedef struct {
 } tuple;
 
 typedef struct {
-    char desc[50];
+    char desc[150];
     tuple t;
 } tuple_with_desc;
 
@@ -67,7 +67,7 @@ extern int string_const_to_int(const char* str);
 extern const char* number_to_const_string(int number);
 extern int has_value(tuple *t, int value);
 extern tuple create_tuple_from_string(const char* str);
-extern tuple_with_desc create_tuple_desc_from_string(const char* str);
+extern void create_tuple_desc_from_string(tuple_with_desc *t_d, const char* str);
 extern int compare_ints(const void *a, const void *b);
 extern bool compare_arrays(int *arr1, int len1, int *arr2, int len2);
 extern bool tuple_exists(tuples *array, int array_len, tuples target);
