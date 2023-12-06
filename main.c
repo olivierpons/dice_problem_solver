@@ -293,7 +293,115 @@ void generate_all_groupings(
     }
 }
 
+#define NUM_DICE 7
+int dice_odin[] = {HERO, CAPTAIN, SOLDIER, TRAITOR, CURSED, MAGE};
+int dice_coba[] = {POTTER, PEASANT, SCRIBE, THIEF, SHAMAN, QUEEN};
+
+void printArray(int* array, int size) {
+    for (int i = 0; i < size; i++)
+        printf("%d ", array[i]);
+    printf("\n");
+}
+
+void generateCombinations() {
+    tuple_with_desc t_d;
+    memset(&t_d, 0, sizeof(tuple_with_desc));
+
+    int globals[MAX_GLOBAL] = {0};
+    int len_globals = 0;
+    int local[MAX_LOCAL] = {0};
+    int len_local = 0;
+    int c[14];
+/*
+ * First found:
+[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Potter/1] = 14 - [Hero/3, Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Potter/1] = 14
+[Hero/3, Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Potter/1] = 17 - [Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Shaman/7] = 17
+[Hero/3, Hero/3, Hero/3, Hero/3] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3] = 12
+[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Scribe/2] = 15 - [Hero/3, Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Scribe/2] = 15
+[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Thief/-1] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3] = 12
+[Hero/3, Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Potter/1] = 17 - [Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Shaman/7] = 17
+[Hero/3, Hero/3, Hero/3, Hero/3] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3, Potter/0] = 12
+[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Thief/-1] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3] = 12
+[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Scribe/2] = 15 - [Hero/3, Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Scribe/2] = 15
+[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Scribe/2] = 15 - [Hero/3, Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Scribe/2] = 15
+[Hero/3, Hero/3, Hero/3, Hero/3, Scribe/0, Queen/3] = 15 - [Hero/3, Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Scribe/2] = 15
+[Hero/3, Hero/3, Hero/3, Hero/3, Scribe/0, Queen/3] = 15 - [Hero/3, Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Scribe/2] = 15
+[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Thief/-1] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3] = 12
+[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Thief/-1] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3] = 12
+[Hero/3, Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Potter/1] = 17 - [Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Shaman/7] = 17
+[Hero/3, Hero/3, Hero/3, Hero/3] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3, Potter/0, Potter/0] = 12
+[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Thief/-1] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3] = 12
+[Hero/3, Hero/3, Hero/3, Hero/3, Scribe/0, Queen/3] = 15 - [Hero/3, Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Scribe/2] = 15
+[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Thief/-1] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3] = 12
+[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Peasant/2, Thief/-1] = 14 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Peasant/2, Queen/3] = 14
+[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Peasant/2, Thief/-1] = 14 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Peasant/2, Queen/3] = 14
+[Hero/3, Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Queen/3] = 15 - [Hero/3, Hero/3, Hero/3, Peasant/2, Scribe/2, Scribe/2] = 15
+
+ */
+    for (int odin1=0; odin1 < 6; odin1++) {
+        for (int odin2=0; odin2 < 6; odin2++) {
+            for (int odin3=0; odin3 < 6; odin3++) {
+                for (int odin4=0; odin4 < 6; odin4++) {
+                    for (int odin5=0; odin5 < 6; odin5++) {
+                        for (int odin6=0; odin6 < 6; odin6++) {
+                            for (int odin7=0; odin7 < 6; odin7++) {
+                                for (int coba1=0; coba1 < 6; coba1++) {
+                                    for (int coba2=0; coba2 < 6; coba2++) {
+                                        for (int coba3=0; coba3 < 6; coba3++) {
+                                            for (int coba4=0; coba4 < 6; coba4++) {
+                                                for (int coba5=0; coba5 < 6; coba5++) {
+                                                    for (int coba6=0; coba6 < 6; coba6++) {
+                                                        for (int coba7=0; coba7 < 6; coba7++) {
+                                                            t_d.t.a[ 0] = dice_odin[odin1];
+                                                            t_d.t.a[ 1] = dice_odin[odin2];
+                                                            t_d.t.a[ 2] = dice_odin[odin3];
+                                                            t_d.t.a[ 3] = dice_odin[odin4];
+                                                            t_d.t.a[ 4] = dice_odin[odin5];
+                                                            t_d.t.a[ 5] = dice_odin[odin6];
+                                                            t_d.t.a[ 6] = dice_odin[odin7];
+                                                            t_d.t.a[ 7] = dice_coba[coba1];
+                                                            t_d.t.a[ 8] = dice_coba[coba2];
+                                                            t_d.t.a[ 9] = dice_coba[coba3];
+                                                            t_d.t.a[10] = dice_coba[coba4];
+                                                            t_d.t.a[11] = dice_coba[coba5];
+                                                            t_d.t.a[12] = dice_coba[coba6];
+                                                            t_d.t.a[13] = dice_coba[coba7];
+                                                            t_d.t.a_len = 14;
+                                                            tuples* tps_ok = NULL;
+                                                            int tps_size = 0, tps_capacity = 0;
+                                                            do {
+                                                                generate_all_groupings(
+                                                                    t_d.t.a, t_d.t.a_len, local, len_local, globals, len_globals,
+                                                                    &tps_ok, &tps_size, &tps_capacity
+                                                                );
+                                                            } while (next_permutation(t_d.t.a, t_d.t.a_len));
+                                                            if (tps_size == 1) {
+                                                                print_tuple(&tps_ok[tps_size-1].a1, ", ", " - ", true);
+                                                                print_tuple(&tps_ok[tps_size-1].a2, ", ", "\n", true);
+                                                            }
+                                                            free(tps_ok);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}
 int main() {
+    int currentOdin[NUM_DICE];
+    int currentCoba[NUM_DICE];
+    generateCombinations();
+    return 0;
+
     /* region problems */
     char *s[] = {
         // Odin:
@@ -407,7 +515,7 @@ int main() {
 
     const int s_size = sizeof(s) / sizeof(s[0]);
     for (int i = 0; i < s_size; i++) {
-        tuple_with_desc t_d;
+        tuple_with_desc  t_d;
         create_tuple_desc_from_string(&t_d, s[i]);
 
         int globals[MAX_GLOBAL] = {0};

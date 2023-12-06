@@ -30,7 +30,7 @@
 #define JAGUAR (int) 23
 #define BEE (int) 24
 
-#define MAX_NORMAL (int)7
+#define MAX_NORMAL (int)14
 #define NUM_ROLES 24
 #define MAX_GLOBAL 4
 #define MAX_LOCAL MAX_GLOBAL
@@ -72,4 +72,6 @@ extern int compare_ints(const void *a, const void *b);
 extern bool compare_arrays(int *arr1, int len1, int *arr2, int len2);
 extern bool tuple_exists(tuples *array, int array_len, tuples target);
 
+extern int values_white[12];
+extern int values_black[12];
 #endif // STRUCTS_H

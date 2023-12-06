@@ -287,9 +287,43 @@ bool tuple_exists(tuples *array, int array_len, tuples target) {
             compare_arrays(array[i].a1.a, array[i].a1.a_len, target.a1.a, target.a1.a_len) &&
             compare_arrays(array[i].a2.a, array[i].a2.a_len, target.a2.a, target.a2.a_len) &&
             compare_arrays(array[i].global, array[i].len_global, target.global, target.len_global)
-        ) {
+            ) {
             return true;
         }
     }
     return false;
 }
+
+int values_white[12] = {
+    /* Odin / white */
+    HERO,
+    CAPTAIN,
+    SOLDIER,
+    TRAITOR,
+    CURSED,
+    MAGE,
+    /* Coba / white */
+    POTTER,
+    PEASANT,
+    SCRIBE,
+    THIEF,
+    SHAMAN,
+    QUEEN,
+};
+
+int values_black[12] = {
+    /* Odin / black */
+    WOLF,
+    SNAKE,
+    HORSE,
+    DRAGON,
+    WILDBOAR,
+    EAGLE,
+    /* Coba / black */
+    ARMADILLO,
+    DEER,
+    IGUANA,
+    SCORPIO,
+    JAGUAR,
+    BEE,
+};
