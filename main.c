@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
 
 #include "calc_odin.h"
 #include "calc_coba.h"
@@ -314,6 +315,7 @@ void generateCombinations() {
     int c[14];
 /*
  * First found:
+odin1=0, odin2=0, odin3=0, odin4=0, odin5=0, odin6=0, odin7=0, coba1=0, coba2=0, coba3=0, coba4=0, coba5=0
 [Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Potter/1] = 14 - [Hero/3, Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Potter/1] = 14
 [Hero/3, Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Potter/1] = 17 - [Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Shaman/7] = 17
 [Hero/3, Hero/3, Hero/3, Hero/3] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3] = 12
@@ -322,21 +324,30 @@ void generateCombinations() {
 [Hero/3, Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Potter/1] = 17 - [Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Shaman/7] = 17
 [Hero/3, Hero/3, Hero/3, Hero/3] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3, Potter/0] = 12
 [Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Thief/-1] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3] = 12
+Took 0 h 0 mn 24 s to execute.
+odin1=0, odin2=0, odin3=0, odin4=0, odin5=0, odin6=0, odin7=0, coba1=0, coba2=0, coba3=0, coba4=0, coba5=1
+Took 0 h 1 mn 40 s to execute.
+odin1=0, odin2=0, odin3=0, odin4=0, odin5=0, odin6=0, odin7=0, coba1=0, coba2=0, coba3=0, coba4=0, coba5=2
 [Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Scribe/2] = 15 - [Hero/3, Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Scribe/2] = 15
 [Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Scribe/2] = 15 - [Hero/3, Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Scribe/2] = 15
 [Hero/3, Hero/3, Hero/3, Hero/3, Scribe/0, Queen/3] = 15 - [Hero/3, Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Scribe/2] = 15
 [Hero/3, Hero/3, Hero/3, Hero/3, Scribe/0, Queen/3] = 15 - [Hero/3, Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Scribe/2] = 15
+Took 0 h 1 mn 41 s to execute.
+odin1=0, odin2=0, odin3=0, odin4=0, odin5=0, odin6=0, odin7=0, coba1=0, coba2=0, coba3=0, coba4=0, coba5=3
 [Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Thief/-1] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3] = 12
 [Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Thief/-1] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3] = 12
+Took 0 h 1 mn 42 s to execute.
+odin1=0, odin2=0, odin3=0, odin4=0, odin5=0, odin6=0, odin7=0, coba1=0, coba2=0, coba3=0, coba4=0, coba5=4
 [Hero/3, Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Potter/1] = 17 - [Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Shaman/7] = 17
+Took 0 h 1 mn 42 s to execute.
+odin1=0, odin2=0, odin3=0, odin4=0, odin5=0, odin6=0, odin7=0, coba1=0, coba2=0, coba3=0, coba4=0, coba5=5
 [Hero/3, Hero/3, Hero/3, Hero/3] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3, Potter/0, Potter/0] = 12
 [Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Thief/-1] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3] = 12
 [Hero/3, Hero/3, Hero/3, Hero/3, Scribe/0, Queen/3] = 15 - [Hero/3, Hero/3, Hero/3, Potter/1, Potter/1, Potter/1, Potter/1, Scribe/2] = 15
 [Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Thief/-1] = 12 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Potter/0, Queen/3] = 12
-[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Peasant/2, Thief/-1] = 14 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Peasant/2, Queen/3] = 14
-[Hero/3, Hero/3, Hero/3, Hero/3, Potter/1, Peasant/2, Thief/-1] = 14 - [Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Peasant/2, Queen/3] = 14
-[Hero/3, Hero/3, Hero/3, Hero/3, Potter/0, Potter/0, Potter/0, Queen/3] = 15 - [Hero/3, Hero/3, Hero/3, Peasant/2, Scribe/2, Scribe/2] = 15
-
+Took 0 h 1 mn 49 s to execute.
+odin1=0, odin2=0, odin3=0, odin4=0, odin5=0, odin6=0, odin7=0, coba1=0, coba2=0, coba3=0, coba4=1, coba5=0
+Took 0 h 1 mn 42 s to execute.
  */
     for (int odin1=0; odin1 < 6; odin1++) {
         for (int odin2=0; odin2 < 6; odin2++) {
@@ -350,8 +361,24 @@ void generateCombinations() {
                                         for (int coba3=0; coba3 < 6; coba3++) {
                                             for (int coba4=0; coba4 < 6; coba4++) {
                                                 for (int coba5=0; coba5 < 6; coba5++) {
+                                                    clock_t start, end;
+                                                    double cpu_time_used;
+                                                    start = clock();
+                                                    printf(
+                                                        "odin1=%d, odin2=%d, odin3=%d, "
+                                                        "odin4=%d, odin5=%d, odin6=%d, "
+                                                        "odin7=%d, "
+                                                        "coba1=%d, coba2=%d, coba3=%d, "
+                                                        "coba4=%d, coba5=%d\n",
+                                                        odin1, odin2, odin3,
+                                                        odin4, odin5, odin6,
+                                                        odin7,
+                                                        coba1, coba2, coba3,
+                                                        coba4, coba5
+                                                    );
                                                     for (int coba6=0; coba6 < 6; coba6++) {
                                                         for (int coba7=0; coba7 < 6; coba7++) {
+
                                                             t_d.t.a[ 0] = dice_odin[odin1];
                                                             t_d.t.a[ 1] = dice_odin[odin2];
                                                             t_d.t.a[ 2] = dice_odin[odin3];
@@ -380,9 +407,16 @@ void generateCombinations() {
                                                                 print_tuple(&tps_ok[tps_size-1].a2, ", ", "\n", true);
                                                             }
                                                             free(tps_ok);
+
                                                         }
                                                     }
-                                                }
+                                                    end = clock();
+                                                    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+                                                    // Convert to hours, minutes, and seconds
+                                                    int hours = (int) cpu_time_used / 3600;
+                                                    int minutes = ((int) cpu_time_used % 3600) / 60;
+                                                    int seconds = (int) cpu_time_used % 60;
+                                                    printf("Took %d h %d mn %d s to execute.\n", hours, minutes, seconds);                                                }
                                             }
                                         }
                                     }
