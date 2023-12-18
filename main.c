@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <time.h>
+#include <omp.h>
 
 #include "calc_odin.h"
 #include "calc_coba.h"
@@ -306,13 +307,11 @@ void printArray(int* array, int size) {
 
 void generateCombinations() {
     tuple_with_desc t_d;
-    memset(&t_d, 0, sizeof(tuple_with_desc));
-
+    clock_t start, end;
     int globals[MAX_GLOBAL] = {0};
     int len_globals = 0;
     int local[MAX_LOCAL] = {0};
     int len_local = 0;
-    int c[14];
 /*
  * First found:
 odin1=0, odin2=0, odin3=0, odin4=0, odin5=0, odin6=0, odin7=0, coba1=0, coba2=0, coba3=0, coba4=0, coba5=0
@@ -349,6 +348,13 @@ Took 0 h 1 mn 49 s to execute.
 odin1=0, odin2=0, odin3=0, odin4=0, odin5=0, odin6=0, odin7=0, coba1=0, coba2=0, coba3=0, coba4=1, coba5=0
 Took 0 h 1 mn 42 s to execute.
  */
+    // Set the number of threads to use based on the number of available
+    // processors:
+    omp_set_num_threads(omp_get_num_procs());
+    // The 'collapse(x)' directive merges the x innermost loops into a single
+    // parallel loop:
+    #pragma omp parallel for collapse(1) private(t_d, globals, local, start, end)
+
     for (int odin1=0; odin1 < 6; odin1++) {
         for (int odin2=0; odin2 < 6; odin2++) {
             for (int odin3=0; odin3 < 6; odin3++) {
@@ -361,7 +367,6 @@ Took 0 h 1 mn 42 s to execute.
                                         for (int coba3=0; coba3 < 6; coba3++) {
                                             for (int coba4=0; coba4 < 6; coba4++) {
                                                 for (int coba5=0; coba5 < 6; coba5++) {
-                                                    clock_t start, end;
                                                     double cpu_time_used;
                                                     start = clock();
                                                     printf(
@@ -378,7 +383,9 @@ Took 0 h 1 mn 42 s to execute.
                                                     );
                                                     for (int coba6=0; coba6 < 6; coba6++) {
                                                         for (int coba7=0; coba7 < 6; coba7++) {
-
+                                                            tuples* tps_ok = NULL;
+                                                            int tps_size = 0, tps_capacity = 0;
+                                                            memset(&t_d, 0, sizeof(tuple_with_desc));
                                                             t_d.t.a[ 0] = dice_odin[odin1];
                                                             t_d.t.a[ 1] = dice_odin[odin2];
                                                             t_d.t.a[ 2] = dice_odin[odin3];
@@ -394,8 +401,6 @@ Took 0 h 1 mn 42 s to execute.
                                                             t_d.t.a[12] = dice_coba[coba6];
                                                             t_d.t.a[13] = dice_coba[coba7];
                                                             t_d.t.a_len = 14;
-                                                            tuples* tps_ok = NULL;
-                                                            int tps_size = 0, tps_capacity = 0;
                                                             do {
                                                                 generate_all_groupings(
                                                                     t_d.t.a, t_d.t.a_len, local, len_local, globals, len_globals,
@@ -428,8 +433,8 @@ Took 0 h 1 mn 42 s to execute.
             }
         }
     }
-
 }
+
 int main() {
     int currentOdin[NUM_DICE];
     int currentCoba[NUM_DICE];
