@@ -305,13 +305,6 @@ void printArray(int* array, int size) {
     printf("\n");
 }
 
-void generateCombinations() {
-    tuple_with_desc t_d;
-    clock_t start, end;
-    int globals[MAX_GLOBAL] = {0};
-    int len_globals = 0;
-    int local[MAX_LOCAL] = {0};
-    int len_local = 0;
 /*
  * First found:
 odin1=0, odin2=0, odin3=0, odin4=0, odin5=0, odin6=0, odin7=0, coba1=0, coba2=0, coba3=0, coba4=0, coba5=0
@@ -348,12 +341,20 @@ Took 0 h 1 mn 49 s to execute.
 odin1=0, odin2=0, odin3=0, odin4=0, odin5=0, odin6=0, odin7=0, coba1=0, coba2=0, coba3=0, coba4=1, coba5=0
 Took 0 h 1 mn 42 s to execute.
  */
+void generateCombinations() {
+    tuple_with_desc t_d;
+    int globals[MAX_GLOBAL] = {0};
+    int len_globals = 0;
+    int local[MAX_LOCAL] = {0};
+    int len_local = 0;
+    tuples* tps_ok = NULL;
+    int tps_size = 0, tps_capacity = 0;
     // Set the number of threads to use based on the number of available
     // processors:
-    omp_set_num_threads(omp_get_num_procs());
+    omp_set_num_threads(omp_get_num_procs() / 2);
     // The 'collapse(x)' directive merges the x innermost loops into a single
     // parallel loop:
-    #pragma omp parallel for collapse(1) private(t_d, globals, local, start, end)
+#pragma omp parallel for collapse(3) private(t_d, globals, local, tps_ok, tps_size, tps_capacity)
 
     for (int odin1=0; odin1 < 6; odin1++) {
         for (int odin2=0; odin2 < 6; odin2++) {
@@ -367,24 +368,18 @@ Took 0 h 1 mn 42 s to execute.
                                         for (int coba3=0; coba3 < 6; coba3++) {
                                             for (int coba4=0; coba4 < 6; coba4++) {
                                                 for (int coba5=0; coba5 < 6; coba5++) {
-                                                    double cpu_time_used;
-                                                    start = clock();
-                                                    printf(
-                                                        "odin1=%d, odin2=%d, odin3=%d, "
-                                                        "odin4=%d, odin5=%d, odin6=%d, "
-                                                        "odin7=%d, "
-                                                        "coba1=%d, coba2=%d, coba3=%d, "
-                                                        "coba4=%d, coba5=%d\n",
-                                                        odin1, odin2, odin3,
-                                                        odin4, odin5, odin6,
-                                                        odin7,
-                                                        coba1, coba2, coba3,
-                                                        coba4, coba5
-                                                    );
                                                     for (int coba6=0; coba6 < 6; coba6++) {
                                                         for (int coba7=0; coba7 < 6; coba7++) {
-                                                            tuples* tps_ok = NULL;
-                                                            int tps_size = 0, tps_capacity = 0;
+                                                            double start, end, cpu_time_used;
+                                                            start = omp_get_wtime();
+                                                            printf(
+                                                                "%d%d%d%d%d%d%d%d%d%d%d%d%d%d\n",
+                                                                odin1, odin2, odin3, odin4, odin5,
+                                                                odin6, odin7, coba1, coba2, coba3,
+                                                                coba4, coba5, coba6, coba7
+                                                            );
+                                                            tps_ok = NULL;
+                                                            tps_size = tps_capacity = 0;
                                                             memset(&t_d, 0, sizeof(tuple_with_desc));
                                                             t_d.t.a[ 0] = dice_odin[odin1];
                                                             t_d.t.a[ 1] = dice_odin[odin2];
@@ -413,15 +408,20 @@ Took 0 h 1 mn 42 s to execute.
                                                             }
                                                             free(tps_ok);
 
+                                                            end = omp_get_wtime();
+                                                            cpu_time_used = end - start;
+                                                            // Convert to hours, minutes, and seconds
+                                                            int hours = (int) cpu_time_used / 3600;
+                                                            int minutes = ((int) cpu_time_used % 3600) / 60;
+                                                            int seconds = (int) cpu_time_used % 60;
+                                                            printf(
+                                                                "%d%d%d%d%d%d%d%d%d%d%d%d%d%d took %d h %d mn %d s to execute.\n",
+                                                                odin1, odin2, odin3, odin4, odin5, odin6, odin7, coba1, coba2,
+                                                                coba3, coba4, coba5, coba6, coba7, hours, minutes, seconds
+                                                            );
                                                         }
                                                     }
-                                                    end = clock();
-                                                    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-                                                    // Convert to hours, minutes, and seconds
-                                                    int hours = (int) cpu_time_used / 3600;
-                                                    int minutes = ((int) cpu_time_used % 3600) / 60;
-                                                    int seconds = (int) cpu_time_used % 60;
-                                                    printf("Took %d h %d mn %d s to execute.\n", hours, minutes, seconds);                                                }
+                                                }
                                             }
                                         }
                                     }
@@ -436,8 +436,8 @@ Took 0 h 1 mn 42 s to execute.
 }
 
 int main() {
-    int currentOdin[NUM_DICE];
-    int currentCoba[NUM_DICE];
+//    int currentOdin[NUM_DICE];
+//    int currentCoba[NUM_DICE];
     generateCombinations();
     return 0;
 

@@ -43,7 +43,7 @@ void print_role(int role) {
     }
 }
 
-void  print_tuple(
+void print_tuple(
     const tuple *t, const char *delimiter, const char *end, bool with_sum
 ) {
     printf("[");
