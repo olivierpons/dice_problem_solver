@@ -1,16 +1,3 @@
-Objective
-=========
-
-I decided to code a program that searches for all the solutions to these 
-two puzzles (google for "oldchap.games"):
- 
-- "Coba", written by Antonin Boccara and Michel Verdu, published by Oldchap
-- "By Odin", written by Antonin Boccara and Michel Verdu, published by Oldchap
-
-I first used the help of ChatGPT, but of course, as in all cases where one 
-must do something advanced, it served only as an assistant, and I had to 
-finish all the parts of the code that were truly complicated.
-
 Official description of "Coba"
 ==============================
 
@@ -43,6 +30,16 @@ A very small box for hours of gameplay!
 
 Development
 ===========
+
+I decided to code a program that searches for all the solutions to these
+two puzzles (google for "oldchap.games"):
+
+- "Coba", written by Antonin Boccara and Michel Verdu, published by Oldchap
+- "By Odin", written by Antonin Boccara and Michel Verdu, published by Oldchap
+
+I first used the help of ChatGPT, but of course, as in all cases where one
+must do something advanced, it served only as an assistant, and I had to
+finish all the parts of the code that were truly complicated.
 
 "I have completed the full implementation, and now my computer is running to 
 search for all possibilities with 7 white dice from the first puzzle and
