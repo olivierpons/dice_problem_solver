@@ -422,6 +422,11 @@ void prepareCombination(int *combination) {
     sortGroup(combination + 7, 7);
 }
 
+#define PRINT_CURRENT_COMB(more) printf(\
+    "%d%d%d%d%d%d%d%d%d%d%d%d%d%d%s%s", \
+    odin1, odin2, odin3, odin4, odin5, odin6, odin7, \
+    coba1, coba2, coba3, coba4, coba5, coba6, coba7, \
+    more, (strlen(more) ? "\n": ""))
 void generateCombinations() {
     tuple_with_desc t_d;
     int globals[MAX_GLOBAL] = {0};
@@ -470,12 +475,7 @@ void generateCombinations() {
                                                                 );
                                                             }
                                                             if (already_done) {
-                                                                printf(
-                                                                    "%d%d%d%d%d%d%d%d%d%d%d%d%d%d exists, continue.\n",
-                                                                    odin1, odin2, odin3, odin4, odin5,
-                                                                    odin6, odin7, coba1, coba2, coba3,
-                                                                    coba4, coba5, coba6, coba7
-                                                                );
+                                                                PRINT_CURRENT_COMB(" exists, continue.");
                                                                 continue;
                                                             }
                                                             #pragma omp critical
@@ -488,12 +488,7 @@ void generateCombinations() {
                                                             }
                                                             double start, end, cpu_time_used;
                                                             start = omp_get_wtime();
-                                                            printf(
-                                                                "%d%d%d%d%d%d%d%d%d%d%d%d%d%d\n",
-                                                                odin1, odin2, odin3, odin4, odin5,
-                                                                odin6, odin7, coba1, coba2, coba3,
-                                                                coba4, coba5, coba6, coba7
-                                                            );
+                                                            PRINT_CURRENT_COMB("...");
                                                             tps_ok = NULL;
                                                             tps_size = tps_capacity = 0;
                                                             memset(&t_d, 0, sizeof(tuple_with_desc));
@@ -532,10 +527,10 @@ void generateCombinations() {
                                                             int hours = (int) cpu_time_used / 3600;
                                                             int minutes = ((int) cpu_time_used % 3600) / 60;
                                                             int seconds = (int) cpu_time_used % 60;
+                                                            PRINT_CURRENT_COMB("");
                                                             printf(
-                                                                "%d%d%d%d%d%d%d%d%d%d%d%d%d%d took %d h %d mn %d s to execute.\n",
-                                                                odin1, odin2, odin3, odin4, odin5, odin6, odin7, coba1, coba2,
-                                                                coba3, coba4, coba5, coba6, coba7, hours, minutes, seconds
+                                                                " took %d h %d mn %d s to execute.\n",
+                                                                hours, minutes, seconds
                                                             );
                                                         }
                                                     }
