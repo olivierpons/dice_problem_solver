@@ -440,8 +440,8 @@ void generateCombinations() {
     // The 'collapse(x)' directive merges the x innermost loops into a single
     // parallel loop:
 #pragma omp parallel for collapse(3) \
-    private(t_d, globals, len_globals, local, len_local, tps_ok, tps_size, tps_capacity) \
-    default(none) shared(combSet, dice_odin, dice_coba)
+    private(t_d, tps_ok, tps_size, tps_capacity) \
+    default(none) shared(globals, len_globals, local, len_local, combSet, dice_odin, dice_coba)
 
     for (int odin1=0; odin1 < 6; odin1++) {
         for (int odin2=0; odin2 < 6; odin2++) {
@@ -555,6 +555,10 @@ void generateCombinations() {
 }
 
 int main() {
+    setbuf(stdout, NULL);
+    setbuf(stderr, NULL);
+    setbuf(stdin, NULL);
+
     #ifdef __linux__
     char buffer[128];
     FILE *fp = fopen("/etc/os-release", "r");
