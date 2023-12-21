@@ -391,8 +391,6 @@ void freeCombinationSet(CombinationSet *set) {
 
 bool addCombination(CombinationSet *set, int *combination, int len) {
     if (getAvailableMemoryPercentage() < 2.0) {
-        // Si moins de 2% de RAM disponible, libérer la mémoire et quitter
-        freeCombinationSet(set);
         return false;
     }
 
@@ -483,6 +481,7 @@ void generateCombinations() {
                                                             #pragma omp critical
                                                             {
                                                                 if (!addCombination(&combSet, currentCombination, 14)) {
+                                                                    printf("Not enough memory, stopping.\n");
                                                                     freeCombinationSet(&combSet);
                                                                     exit(-1);
                                                                 }
