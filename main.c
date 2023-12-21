@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <time.h>
 #include <omp.h>
 #include <sys/sysinfo.h>
 
@@ -362,7 +361,6 @@ float getAvailableMemoryPercentage() {
     unsigned long long free_ram = info.freeram * info.mem_unit;
     double total_ram_double = (double)total_ram;
     double free_ram_double = (double)free_ram;
-
     return (float)(free_ram_double / total_ram_double * 100.0);
 }
 
@@ -466,7 +464,14 @@ void generateCombinations() {
                                                                 coba1, coba2, coba3, coba4, coba5, coba6, coba7,
                                                             };
                                                             prepareCombination(currentCombination);
-                                                            if (combinationExists(&combSet, currentCombination, 14)) {
+                                                            bool already_done;
+                                                            #pragma omp critical
+                                                            {
+                                                                already_done = combinationExists(
+                                                                    &combSet, currentCombination, 14
+                                                                );
+                                                            }
+                                                            if (already_done) {
                                                                 printf(
                                                                     "%d%d%d%d%d%d%d%d%d%d%d%d%d%d exists, continue.\n",
                                                                     odin1, odin2, odin3, odin4, odin5,
@@ -475,9 +480,12 @@ void generateCombinations() {
                                                                 );
                                                                 continue;
                                                             }
-                                                            if (!addCombination(&combSet, currentCombination, 14)) {
-                                                                freeCombinationSet(&combSet);
-                                                                exit(-1);
+                                                            #pragma omp critical
+                                                            {
+                                                                if (!addCombination(&combSet, currentCombination, 14)) {
+                                                                    freeCombinationSet(&combSet);
+                                                                    exit(-1);
+                                                                }
                                                             }
                                                             double start, end, cpu_time_used;
                                                             start = omp_get_wtime();
@@ -548,6 +556,32 @@ void generateCombinations() {
 }
 
 int main() {
+    #ifdef __linux__
+    char buffer[128];
+    FILE *fp = fopen("/etc/os-release", "r");
+    if (fp == NULL) {
+        printf("Cannot open /etc/os-release. Exiting.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int isDebianBased = 0;
+    while (fgets(buffer, 128, fp) != NULL) {
+        if (strstr(buffer, "ID_LIKE=") && strstr(buffer, "debian")) {
+            isDebianBased = 1;
+            break;
+        }
+        if (strstr(buffer, "ID=debian")) {
+            isDebianBased = 1;
+            break;
+        }
+    }
+    fclose(fp);
+
+    if (!isDebianBased) {
+        printf("This program is intended to be run on Debian or its derivatives. Exiting.\n");
+        exit(EXIT_FAILURE);
+    }
+
 //    int currentOdin[NUM_DICE];
 //    int currentCoba[NUM_DICE];
     generateCombinations();
@@ -712,4 +746,8 @@ int main() {
 
     }
     return 0;
+    #else
+    printf("This program can only be run on Linux Debian. Exiting.\n");
+    exit(EXIT_FAILURE);
+    #endif
 }
