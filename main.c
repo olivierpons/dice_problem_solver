@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <omp.h>
+#include <sys/sysinfo.h>
 
 #include "calc_odin.h"
 #include "calc_coba.h"
@@ -352,6 +353,19 @@ typedef struct {
     CombinationNode *head;
 } CombinationSet;
 
+float getAvailableMemoryPercentage() {
+    struct sysinfo info;
+    if (sysinfo(&info) != 0) {
+        return -1.0f;
+    }
+    unsigned long long total_ram = info.totalram * info.mem_unit;
+    unsigned long long free_ram = info.freeram * info.mem_unit;
+    double total_ram_double = (double)total_ram;
+    double free_ram_double = (double)free_ram;
+
+    return (float)(free_ram_double / total_ram_double * 100.0);
+}
+
 bool combinationExists(CombinationSet *set, int *combination, int len) {
     CombinationNode *node = set->head;
     while (node) {
@@ -361,17 +375,6 @@ bool combinationExists(CombinationSet *set, int *combination, int len) {
         node = node->next;
     }
     return false;
-}
-
-void addCombination(CombinationSet *set, int *combination, int len) {
-    CombinationNode *newNode = malloc(sizeof(CombinationNode));
-    if (newNode == NULL) {
-        return;
-    }
-    memcpy(newNode->combination, combination, len * sizeof(int));
-    newNode->len = len;
-    newNode->next = set->head;
-    set->head = newNode;
 }
 
 void initCombinationSet(CombinationSet *set) {
@@ -388,22 +391,22 @@ void freeCombinationSet(CombinationSet *set) {
     set->head = NULL;
 }
 
-void printCombination(const int *combination, int len) {
-    printf("-");
-    for (int i = 0; i < len; ++i) {
-        printf("%d", combination[i]);
+bool addCombination(CombinationSet *set, int *combination, int len) {
+    if (getAvailableMemoryPercentage() < 2.0) {
+        // Si moins de 2% de RAM disponible, libérer la mémoire et quitter
+        freeCombinationSet(set);
+        return false;
     }
-    printf("\n");
-}
 
-void printCombinations(const CombinationSet *set) {
-    printf("**********************************\n");
-    CombinationNode *node = set->head;
-    while (node) {
-        printCombination(node->combination, node->len);
-        node = node->next;
+    CombinationNode *newNode = malloc(sizeof(CombinationNode));
+    if (newNode == NULL) {
+        return false;
     }
-    printf("----------------\n");
+    memcpy(newNode->combination, combination, len * sizeof(int));
+    newNode->len = len;
+    newNode->next = set->head;
+    set->head = newNode;
+    return true;
 }
 
 void sortGroup(int *group, int len) {
@@ -472,7 +475,10 @@ void generateCombinations() {
                                                                 );
                                                                 continue;
                                                             }
-                                                            addCombination(&combSet, currentCombination, 14);
+                                                            if (!addCombination(&combSet, currentCombination, 14)) {
+                                                                freeCombinationSet(&combSet);
+                                                                exit(-1);
+                                                            }
                                                             double start, end, cpu_time_used;
                                                             start = omp_get_wtime();
                                                             printf(
