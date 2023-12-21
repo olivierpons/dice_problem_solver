@@ -341,6 +341,88 @@ Took 0 h 1 mn 49 s to execute.
 odin1=0, odin2=0, odin3=0, odin4=0, odin5=0, odin6=0, odin7=0, coba1=0, coba2=0, coba3=0, coba4=1, coba5=0
 Took 0 h 1 mn 42 s to execute.
  */
+
+typedef struct CombinationNode {
+    int combination[MAX_NORMAL];
+    int len;
+    struct CombinationNode *next;
+} CombinationNode;
+
+typedef struct {
+    CombinationNode *head;
+} CombinationSet;
+
+bool combinationExists(CombinationSet *set, int *combination, int len) {
+    CombinationNode *node = set->head;
+    while (node) {
+        if (node->len == len && memcmp(node->combination, combination, len * sizeof(int)) == 0) {
+            return true;
+        }
+        node = node->next;
+    }
+    return false;
+}
+
+void addCombination(CombinationSet *set, int *combination, int len) {
+    CombinationNode *newNode = malloc(sizeof(CombinationNode));
+    if (newNode == NULL) {
+        return;
+    }
+    memcpy(newNode->combination, combination, len * sizeof(int));
+    newNode->len = len;
+    newNode->next = set->head;
+    set->head = newNode;
+}
+
+void initCombinationSet(CombinationSet *set) {
+    set->head = NULL;
+}
+
+void freeCombinationSet(CombinationSet *set) {
+    CombinationNode *node = set->head;
+    while (node) {
+        CombinationNode *temp = node;
+        node = node->next;
+        free(temp);
+    }
+    set->head = NULL;
+}
+
+void printCombination(const int *combination, int len) {
+    printf("-");
+    for (int i = 0; i < len; ++i) {
+        printf("%d", combination[i]);
+    }
+    printf("\n");
+}
+
+void printCombinations(const CombinationSet *set) {
+    printf("**********************************\n");
+    CombinationNode *node = set->head;
+    while (node) {
+        printCombination(node->combination, node->len);
+        node = node->next;
+    }
+    printf("----------------\n");
+}
+
+void sortGroup(int *group, int len) {
+    for (int i = 0; i < len - 1; ++i) {
+        for (int j = i + 1; j < len; ++j) {
+            if (group[i] > group[j]) {
+                int temp = group[i];
+                group[i] = group[j];
+                group[j] = temp;
+            }
+        }
+    }
+}
+
+void prepareCombination(int *combination) {
+    sortGroup(combination, 7);
+    sortGroup(combination + 7, 7);
+}
+
 void generateCombinations() {
     tuple_with_desc t_d;
     int globals[MAX_GLOBAL] = {0};
@@ -349,12 +431,18 @@ void generateCombinations() {
     int len_local = 0;
     tuples* tps_ok = NULL;
     int tps_size = 0, tps_capacity = 0;
+
+    CombinationSet combSet;
+    initCombinationSet(&combSet);
+
     // Set the number of threads to use based on the number of available
     // processors:
     omp_set_num_threads(omp_get_num_procs() / 2);
     // The 'collapse(x)' directive merges the x innermost loops into a single
     // parallel loop:
-#pragma omp parallel for collapse(3) private(t_d, globals, local, tps_ok, tps_size, tps_capacity)
+#pragma omp parallel for collapse(3) \
+    private(t_d, globals, len_globals, local, len_local, tps_ok, tps_size, tps_capacity) \
+    default(none) shared(combSet, dice_odin, dice_coba)
 
     for (int odin1=0; odin1 < 6; odin1++) {
         for (int odin2=0; odin2 < 6; odin2++) {
@@ -370,6 +458,21 @@ void generateCombinations() {
                                                 for (int coba5=0; coba5 < 6; coba5++) {
                                                     for (int coba6=0; coba6 < 6; coba6++) {
                                                         for (int coba7=0; coba7 < 6; coba7++) {
+                                                            int currentCombination[14] = {
+                                                                odin1, odin2, odin3, odin4, odin5, odin6, odin7,
+                                                                coba1, coba2, coba3, coba4, coba5, coba6, coba7,
+                                                            };
+                                                            prepareCombination(currentCombination);
+                                                            if (combinationExists(&combSet, currentCombination, 14)) {
+                                                                printf(
+                                                                    "%d%d%d%d%d%d%d%d%d%d%d%d%d%d exists, continue.\n",
+                                                                    odin1, odin2, odin3, odin4, odin5,
+                                                                    odin6, odin7, coba1, coba2, coba3,
+                                                                    coba4, coba5, coba6, coba7
+                                                                );
+                                                                continue;
+                                                            }
+                                                            addCombination(&combSet, currentCombination, 14);
                                                             double start, end, cpu_time_used;
                                                             start = omp_get_wtime();
                                                             printf(
@@ -398,7 +501,9 @@ void generateCombinations() {
                                                             t_d.t.a_len = 14;
                                                             do {
                                                                 generate_all_groupings(
-                                                                    t_d.t.a, t_d.t.a_len, local, len_local, globals, len_globals,
+                                                                    t_d.t.a, t_d.t.a_len,
+                                                                    local, len_local,
+                                                                    globals, len_globals,
                                                                     &tps_ok, &tps_size, &tps_capacity
                                                                 );
                                                             } while (next_permutation(t_d.t.a, t_d.t.a_len));
@@ -433,6 +538,7 @@ void generateCombinations() {
             }
         }
     }
+    freeCombinationSet(&combSet);
 }
 
 int main() {
