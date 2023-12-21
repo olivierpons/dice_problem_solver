@@ -14,6 +14,8 @@ finish all the parts of the code that were truly complicated.
 Official description of "Coba"
 ==============================
 
+<img src="img-coba-dice.png" alt="Coba"  style="max-width: 300px; height: auto;">
+
 The time has come for you to undertake the quest for the stones of Coba... 
 Will you be up to the challenge?
 
@@ -25,6 +27,8 @@ A very small box for hours of gameplay!
 
 Official description of "By Odin"
 =================================
+
+<img src="img-by-odin-dice.png" alt="By Odin"  style="max-width: 300px; height: auto;">
 
 The legend tells that one day a human will come to the realm of Asgard and play 
 alongside the gods… Will you be that hero?
