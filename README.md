@@ -1,5 +1,29 @@
-Official description of "Coba"
-==============================
+Find all the solutions for me please!
+=====================================
+
+I decided to code a program that searches for all the solutions to these
+two puzzles (google for "oldchap.games"):
+
+- "Coba", written by Antonin Boccara and Michel Verdu, published by Oldchap
+- "By Odin", written by Antonin Boccara and Michel Verdu, published by Oldchap
+
+I first used the help of ChatGPT, but of course, as in all cases where one
+must do something advanced, it served only as an assistant, and I had to
+finish all the parts of the code that were truly complicated.
+
+"I have completed the full implementation, and now my computer is running to
+search for all possibilities with 7 white dice from the first puzzle and
+7 white dice from the second puzzle.
+
+I will add all the solutions that have been found as comments in the code.
+Next, there's something more complex, which is to add all the black dice and
+all combinations of all the black dice. For now, I will stop here, and if
+someone wants to pick up the code and finish with all the combinations of all
+the black dice, it would be great to evolve the project and also have all the
+combinations with all the black dice.
+
+Coba
+====
 
 <img src="img-coba-dice.png" alt="Coba" width="300" style="max-width: 300px; height: auto;">
 
@@ -12,8 +36,8 @@ you will discover the game's rich mechanics through various challenges.
 
 A very small box for hours of gameplay!
 
-Official description of "By Odin"
-=================================
+By Odin
+=======
 
 <img src="img-by-odin-dice.png" alt="By Odin" width="300" style="max-width: 300px; height: auto;">
 
@@ -27,27 +51,3 @@ through the challenges, discover the mechanical richness of the game and
 the universe of Norse mythology.
 
 A very small box for hours of gameplay!
-
-Development
-===========
-
-I decided to code a program that searches for all the solutions to these
-two puzzles (google for "oldchap.games"):
-
-- "Coba", written by Antonin Boccara and Michel Verdu, published by Oldchap
-- "By Odin", written by Antonin Boccara and Michel Verdu, published by Oldchap
-
-I first used the help of ChatGPT, but of course, as in all cases where one
-must do something advanced, it served only as an assistant, and I had to
-finish all the parts of the code that were truly complicated.
-
-"I have completed the full implementation, and now my computer is running to 
-search for all possibilities with 7 white dice from the first puzzle and
-7 white dice from the second puzzle.
-
-I will add all the solutions that have been found as comments in the code.
-Next, there's something more complex, which is to add all the black dice and 
-all combinations of all the black dice. For now, I will stop here, and if 
-someone wants to pick up the code and finish with all the combinations of all 
-the black dice, it would be great to evolve the project and also have all the 
-combinations with all the black dice.
