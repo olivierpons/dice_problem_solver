@@ -406,16 +406,18 @@ bool addCombination(CombinationSet *set, int *combination, int len) {
 }
 
 void sortGroup(int *group, int len) {
-    for (int i = 0; i < len - 1; ++i) {
-        for (int j = i + 1; j < len; ++j) {
-            if (group[i] > group[j]) {
-                int temp = group[i];
-                group[i] = group[j];
-                group[j] = temp;
-            }
+    int i, key, j;
+    for (i = 1; i < len; i++) {
+        key = group[i];
+        j = i - 1;
+        while (j >= 0 && group[j] > key) {
+            group[j + 1] = group[j];
+            j = j - 1;
         }
+        group[j + 1] = key;
     }
 }
+
 
 void prepareCombination(int *combination) {
     sortGroup(combination, 7);
