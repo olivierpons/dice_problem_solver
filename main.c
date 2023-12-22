@@ -475,7 +475,7 @@ void generateCombinations() {
                                                                 );
                                                             }
                                                             if (already_done) {
-                                                                PRINT_CURRENT_COMB(" exists, continue.");
+                                                                // PRINT_CURRENT_COMB(" exists, continue.");
                                                                 continue;
                                                             }
                                                             #pragma omp critical
@@ -516,8 +516,17 @@ void generateCombinations() {
                                                                 );
                                                             } while (next_permutation(t_d.t.a, t_d.t.a_len));
                                                             if (tps_size == 1) {
-                                                                print_tuple(&tps_ok[tps_size-1].a1, ", ", " - ", true);
-                                                                print_tuple(&tps_ok[tps_size-1].a2, ", ", "\n", true);
+                                                                #pragma omp critical
+                                                                {
+                                                                    print_tuple(
+                                                                        &tps_ok[tps_size - 1].a1, ", ", " - ",
+                                                                        true
+                                                                    );
+                                                                    print_tuple(
+                                                                        &tps_ok[tps_size - 1].a2, ", ", "\n",
+                                                                        true
+                                                                    );
+                                                                }
                                                             }
                                                             free(tps_ok);
 
