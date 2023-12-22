@@ -468,7 +468,7 @@ void generateCombinations() {
 
     // Set the number of threads to use based on the number of available
     // processors:
-    omp_set_num_threads(omp_get_num_procs() / 2);
+    omp_set_num_threads((omp_get_num_procs() / 4) * 3);
     // The 'collapse(x)' directive merges the x innermost loops into a single
     // parallel loop:
 #pragma omp parallel for collapse(3) \
