@@ -422,13 +422,38 @@ void prepareCombination(int *combination) {
     sortGroup(combination + 7, 7);
 }
 
+void print_omp_critical(
+    int o1, int o2, int o3, int o4, int o5, int o6, int o7,
+    int c1, int c2, int c3, int c4, int c5, int c6, int c7,
+    const tuple *t1, const tuple *t2
+) {
+    #pragma omp critical
+    {
+        print_role(o1); printf(",");
+        print_role(o2); printf(",");
+        print_role(o3); printf(",");
+        print_role(o4); printf(",");
+        print_role(o5); printf(",");
+        print_role(o6); printf(",");
+        print_role(o7); printf(",");
+        print_role(c1); printf(",");
+        print_role(c2); printf(",");
+        print_role(c3); printf(",");
+        print_role(c4); printf(",");
+        print_role(c5); printf(",");
+        print_role(c6); printf(",");
+        print_role(c7); printf(" =>\n");
+        print_tuple(t1, ", ", " - ", true);
+        print_tuple(t2, ", ", "\n", true);
+    }
+}
+
 #define PRINT_CURRENT_COMB(more) printf(\
     "%d%d%d%d%d%d%d%d%d%d%d%d%d%d%s%s", \
     odin1, odin2, odin3, odin4, odin5, odin6, odin7, \
     coba1, coba2, coba3, coba4, coba5, coba6, coba7, \
     more, (strlen(more) ? "\n": ""))
 void generateCombinations() {
-    tuple_with_desc t_d;
     int globals[MAX_GLOBAL] = {0};
     int len_globals = 0;
     int local[MAX_LOCAL] = {0};
@@ -445,7 +470,7 @@ void generateCombinations() {
     // The 'collapse(x)' directive merges the x innermost loops into a single
     // parallel loop:
 #pragma omp parallel for collapse(3) \
-    private(t_d, tps_ok, tps_size, tps_capacity) \
+    private(tps_ok, tps_size, tps_capacity) \
     default(none) shared(globals, len_globals, local, len_local, combSet, dice_odin, dice_coba)
 
     for (int odin1=0; odin1 < 6; odin1++) {
@@ -462,6 +487,8 @@ void generateCombinations() {
                                                 for (int coba5=0; coba5 < 6; coba5++) {
                                                     for (int coba6=0; coba6 < 6; coba6++) {
                                                         for (int coba7=0; coba7 < 6; coba7++) {
+                                                            tuple_with_desc t_d;
+
                                                             int currentCombination[14] = {
                                                                 odin1, odin2, odin3, odin4, odin5, odin6, odin7,
                                                                 coba1, coba2, coba3, coba4, coba5, coba6, coba7,
@@ -516,31 +543,40 @@ void generateCombinations() {
                                                                 );
                                                             } while (next_permutation(t_d.t.a, t_d.t.a_len));
                                                             if (tps_size == 1) {
-                                                                #pragma omp critical
-                                                                {
-                                                                    print_tuple(
-                                                                        &tps_ok[tps_size - 1].a1, ", ", " - ",
-                                                                        true
-                                                                    );
-                                                                    print_tuple(
-                                                                        &tps_ok[tps_size - 1].a2, ", ", "\n",
-                                                                        true
-                                                                    );
-                                                                }
+                                                                print_omp_critical(
+                                                                    dice_odin[odin1],
+                                                                    dice_odin[odin2],
+                                                                    dice_odin[odin3],
+                                                                    dice_odin[odin4],
+                                                                    dice_odin[odin5],
+                                                                    dice_odin[odin6],
+                                                                    dice_odin[odin7],
+                                                                    dice_coba[coba1],
+                                                                    dice_coba[coba2],
+                                                                    dice_coba[coba3],
+                                                                    dice_coba[coba4],
+                                                                    dice_coba[coba5],
+                                                                    dice_coba[coba6],
+                                                                    dice_coba[coba7],
+                                                                    &tps_ok[tps_size - 1].a1,
+                                                                    &tps_ok[tps_size - 1].a2
+                                                                );
                                                             }
                                                             free(tps_ok);
-
                                                             end = omp_get_wtime();
                                                             cpu_time_used = end - start;
                                                             // Convert to hours, minutes, and seconds
                                                             int hours = (int) cpu_time_used / 3600;
                                                             int minutes = ((int) cpu_time_used % 3600) / 60;
                                                             int seconds = (int) cpu_time_used % 60;
-                                                            PRINT_CURRENT_COMB("");
-                                                            printf(
-                                                                " took %d h %d mn %d s to execute.\n",
-                                                                hours, minutes, seconds
-                                                            );
+                                                            #pragma omp critical
+                                                            {
+                                                                PRINT_CURRENT_COMB("");
+                                                                printf(
+                                                                    " took %d h %d mn %d s to execute.\n",
+                                                                    hours, minutes, seconds
+                                                                );
+                                                            }
                                                         }
                                                     }
                                                 }
