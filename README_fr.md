@@ -32,6 +32,18 @@ Dans 'Par Odin', vous incarnez un guerrier humain venu accomplir 50 défis afin 
 Une toute petite boîte pour des heures de jeu !
 
 ## Solutions Trouvées
+- Héros → ⚔️
+- Capitaine → 🎖️
+- Paysan → 👨‍🌾
+- Reine → 👸
+- Soldat → 🪖
+- Potier → ⚱️
+- Scribe → ✍️
+- Mage → 🧙
+- Chaman → 🪬
+- Traître → 🗡️
+- Voleur → 💰
+- Maudit → ☠️
 
 ```
 [🎖️/0, 👨‍🌾/0, ⚔️/3, ⚔️/3, ⚔️/3, ⚔️/3, 👸/3] = 15 - [⚔️/3, 🪖/1, ⚱️/1, ⚱️/1, ⚱️/1, ⚱️/1, 🪬/7] = 15

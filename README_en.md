@@ -31,7 +31,19 @@ In 'Par Odin', you take on the role of a human warrior who has come to accomplis
 
 A very small box for hours of gameplay!
 
-## Solutions Found
+## Solutions Found 
+- Hero → ⚔️
+- Captain → 🎖️
+- Peasant → 👨‍🌾
+- Queen → 👸
+- Soldier → 🪖
+- Potter → ⚱️
+- Scribe → ✍️
+- Mage → 🧙
+- Shaman → 🪬
+- Traitor → 🗡️
+- Thief → 💰
+- Cursed → ☠️
 
 ```
 [🎖️/0, 👨‍🌾/0, ⚔️/3, ⚔️/3, ⚔️/3, ⚔️/3, 👸/3] = 15 - [⚔️/3, 🪖/1, ⚱️/1, ⚱️/1, ⚱️/1, ⚱️/1, 🪬/7] = 15
