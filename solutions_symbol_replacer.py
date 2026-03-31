@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import argparse
 import logging
-import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -398,6 +397,10 @@ def create_parser() -> CustomArgumentParser:
 def replace_entities_with_symbols(text: str, mapping: dict[str, str]) -> str:
     """Replace entity names in text with their UTF-8 symbols.
 
+    Each entity name is always followed by a slash in the input,
+    so a simple string replacement of "Name/" with "symbol/" is
+    sufficient and unambiguous.
+
     Args:
         text: Input text containing entity names.
         mapping: Dictionary of entity names to symbols.
@@ -405,20 +408,10 @@ def replace_entities_with_symbols(text: str, mapping: dict[str, str]) -> str:
     Returns:
         Text with entity names replaced by symbols.
     """
-    if not mapping:
-        return text
-
-    pattern: str = r"(" + "|".join(
-        re.escape(name) for name in mapping.keys()
-    ) + r")(/[^,\]]*)"
-
-    def replace_match(match: re.Match[str]) -> str:
-        entity_name: str = match.group(1)
-        value: str = match.group(2)
-        symbol: str = mapping.get(entity_name, entity_name)
-        return f"{symbol}{value}"
-
-    return re.sub(pattern, replace_match, text)
+    result: str = text
+    for name, symbol in mapping.items():
+        result = result.replace(f"{name}/", f"{symbol}/")
+    return result
 
 
 def check_output_file(output_path: Path, force: bool, quiet: bool) -> bool:
